@@ -18,7 +18,9 @@ jobs:
           path: |
             ~/.cache/bazel
             ~/.cache/bazelisk
-          key: ${{ runner.os }}-Bazel
+          key: ${{ runner.os }}-Bazel-${{ hashFiles('WORKSPACE', '**/BUILD.bazel', '**/package.bzl', 'workspace.bzl') }}
+          restore-keys: |
+            ${{ runner.os }}-Bazel-
       - run: bazel version
       - run: bazel query //...
       - run: bazel build --nobuild //...
