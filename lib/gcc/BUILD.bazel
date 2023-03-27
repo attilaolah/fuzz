@@ -22,6 +22,7 @@ configure_make_lib(
         "implicit-function-declaration",
         "incompatible-pointer-types",
         "int-conversion",
+        "unknown-attributes",
     ])},
     lib_source = lib_source("gcc"),
 )
