@@ -23,7 +23,7 @@ $ docker run -it -v "${PWD}:/build" fuzz
 
 | Build Label | Version |
 |-------------|---------|
-[`//lib/gcc`](https://github.com/attilaolah/fuzz/blob/main/lib/gcc/BUILD.bazel) | 12.2.0 [🔗](https://ftp.gnu.org/gnu/gcc/gcc-12.2.0/gcc-12.2.0.tar.xz) [🔗](https://mirror.kumi.systems/gnu/gcc/gcc-12.2.0/gcc-12.2.0.tar.xz)
+[`//lib/gcc`](https://github.com/attilaolah/fuzz/blob/main/lib/gcc/BUILD.bazel) | 10.4.0 [🔗](https://ftp.gnu.org/gnu/gcc/gcc-10.4.0/gcc-10.4.0.tar.xz) [🔗](https://mirror.kumi.systems/gnu/gcc/gcc-10.4.0/gcc-10.4.0.tar.xz)
 [`//lib/gif`](https://github.com/attilaolah/fuzz/blob/main/lib/gif/BUILD.bazel) | 5.2.1 [🔗](https://downloads.sourceforge.net/project/giflib/giflib-5.2.1.tar.gz)
 [`//lib/iconv`](https://github.com/attilaolah/fuzz/blob/main/lib/iconv/BUILD.bazel) | 1.16 [🔗](https://ftp.gnu.org/pub/gnu/libiconv/libiconv-1.16.tar.gz)
 [`//lib/musl`](https://github.com/attilaolah/fuzz/blob/main/lib/musl/BUILD.bazel) | 1.2.3 [🔗](https://musl.libc.org/releases/musl-1.2.3.tar.gz)
@@ -36,5 +36,5 @@ $ docker run -it -v "${PWD}:/build" fuzz
 
 | Build Label | Version |
 |-------------|---------|
-[`//tools/llvm`](https://github.com/attilaolah/fuzz/blob/main/tools/llvm/BUILD.bazel) | 12.0.0 [🔗](https://github.com/llvm/llvm-project/releases/download/llvmorg-12.0.0/clang+llvm-12.0.0-x86_64-linux-gnu-ubuntu-20.04.tar.xz)
+[`//tools/llvm`](https://github.com/attilaolah/fuzz/blob/main/tools/llvm/BUILD.bazel) | 16.0.0 [🔗](https://github.com/llvm/llvm-project/releases/download/llvmorg-16.0.0/clang+llvm-16.0.0-x86_64-linux-gnu-ubuntu-18.04.tar.xz)
 
