@@ -23,7 +23,6 @@ auto read_span(GifFileType *gif, GifByteType *dst, int size) -> int {
   }
 
   size = std::min(static_cast<int>(src->size), size);
-  std::cout << "READ: " << size << ", left: " << src->size << " bytes." << std::endl;
   std::memcpy(dst, src->data, size);
   src->data += size;
   src->size -= size;
@@ -47,6 +46,7 @@ TEST(GifTest, ReadSucceeded) {
   GifFileType *gif = DGifOpen(&span, read_span, &err);
   ASSERT_NE(gif, nullptr);
 
+  EXPECT_EQ(DGifSlurp(gif), GIF_OK);
   EXPECT_EQ(DGifCloseFile(gif, &err), GIF_OK);
   EXPECT_EQ(err, D_GIF_SUCCEEDED);
 }
