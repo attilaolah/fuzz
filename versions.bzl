@@ -6,6 +6,6 @@ Instead of having to parse the WORKSPACE file, the version consistency tests
 
 GO_VERSION = "1.20.2"
 
-OS_VERSION = "ubuntu-20.04"
+OS_VERSION = "ubuntu-18.04"
 
 RUST_EDITION = "2021"

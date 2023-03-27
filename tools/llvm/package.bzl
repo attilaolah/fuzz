@@ -4,15 +4,15 @@ load("//:http_archive.bzl", "http_archive")
 load("//:versions.bzl", "OS_VERSION")
 load("//toolchains:utils.bzl", "patch_files")
 
-VERSION = "12.0.0"
+VERSION = "16.0.0"
 VERSION_MMP = VERSION.split("-")[0]
 VERSION_ND = VERSION.replace("-", "")
 
 URL = "https://github.com/llvm/llvm-project/releases/download/llvmorg-{version}/clang+llvm-{version}-x86_64-linux-gnu-" + OS_VERSION + ".tar.xz"
-SHA256 = "a9ff205eb0b73ca7c86afc6432eed1c2d49133bd0d49e47b15be59bbf0dd292e"
+SHA256 = "2b8a69798e8dddeb57a186ecac217a35ea45607cb2b3cf30014431cff4340ad1"
 
 FLANG_URL = "https://github.com/llvm/llvm-project/releases/download/llvmorg-{version}/flang-{version}.src.tar.xz"
-FLANG_SHA256 = "dc9420c9f55c6dde633f0f46fe3f682995069cc5247dfdef225cbdfdca79123a"
+FLANG_SHA256 = "2734b4bb13080b874b0b83c203f611e805ed56a284ce080cf8bcdbfa2a064ff2"
 
 BUILD = """
 package(default_visibility = ["//visibility:public"])
