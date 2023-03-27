@@ -1,0 +1,15 @@
+load("//lib:lib.bzl", "lib_package")
+load("//toolchains/make:configure.bzl", "configure_make_lib")
+
+package(default_visibility = ["//:__subpackages__"])
+
+lib_package()
+
+configure_make_lib(
+    name = "z",
+    configure_options = ["--static"],
+    env = {
+        # Needed by //lib/python:runtime?
+        "CFLAGS": "-fPIC",
+    },
+)

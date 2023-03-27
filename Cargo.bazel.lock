@@ -1,0 +1,38 @@
+{
+  "checksum": "3c0bd5d0cebd3f8caa7f6d1f1ac61a9820e51c54a9723edb71e35cf01209b232",
+  "crates": {
+    "fuzz 1.0.0": {
+      "name": "fuzz",
+      "version": "1.0.0",
+      "repository": null,
+      "targets": [
+        {
+          "Library": {
+            "crate_name": "fuzz",
+            "crate_root": "src/lib.rs",
+            "srcs": {
+              "include": [
+                "**/*.rs"
+              ],
+              "exclude": []
+            }
+          }
+        }
+      ],
+      "library_target_name": "fuzz",
+      "common_attrs": {
+        "compile_data_glob": [
+          "**"
+        ],
+        "edition": "2021",
+        "version": "1.0.0"
+      },
+      "license": null
+    }
+  },
+  "binary_crates": [],
+  "workspace_members": {
+    "fuzz 1.0.0": ""
+  },
+  "conditions": {}
+}

@@ -1,0 +1,11 @@
+[package]
+name = "fuzz"
+description = "Collection of fuzz targets for various open-source libraries."
+version = "1.0.0"
+authors = ["Attila Oláh <attilaolah@gmail.com>"]
+readme = "README.md"
+edition = "2021"
+
+[lib]
+
+[dependencies]

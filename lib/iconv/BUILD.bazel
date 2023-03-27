@@ -1,0 +1,17 @@
+load("//lib:lib.bzl", "lib_package")
+load("//toolchains/make:configure.bzl", "configure_make_lib")
+load(":package.bzl", "STATIC_LIBS")
+
+package(default_visibility = ["//:__subpackages__"])
+
+lib_package()
+
+configure_make_lib(
+    name = "iconv",
+    configure_options = [
+        # keep sorted
+        "--disable-shared",
+        "--enable-static",
+    ],
+    out_static_libs = STATIC_LIBS,
+)
