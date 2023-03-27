@@ -1,4 +1,4 @@
-FROM ubuntu:20.04
+FROM ubuntu:18.04
 LABEL maintainer="Attila Oláh (atl@google.com)"
 
 COPY [".", "/etc/"]

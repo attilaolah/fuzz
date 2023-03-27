@@ -36,5 +36,5 @@ $ docker run -it -v "${PWD}:/build" fuzz
 
 | Build Label | Version |
 |-------------|---------|
-[`//tools/llvm`](https://github.com/attilaolah/fuzz/blob/main/tools/llvm/BUILD.bazel) | 12.0.0 [🔗](https://github.com/llvm/llvm-project/releases/download/llvmorg-12.0.0/clang+llvm-12.0.0-x86_64-linux-gnu-ubuntu-20.04.tar.xz)
+[`//tools/llvm`](https://github.com/attilaolah/fuzz/blob/main/tools/llvm/BUILD.bazel) | 16.0.0 [🔗](https://github.com/llvm/llvm-project/releases/download/llvmorg-16.0.0/clang+llvm-16.0.0-x86_64-linux-gnu-ubuntu-18.04.tar.xz)
 
