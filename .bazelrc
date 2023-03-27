@@ -1,0 +1,14 @@
+# CONFIG OPTIONS
+#
+# Allow local workspace config to select a different default:
+try-import %workspace%/.bazelrc.local
+
+# Crosstool setup:
+build:clang --crosstool_top=//toolchains
+
+# Use the "clang" config by default.
+# This will use the //toolchains crosstool top, as specified above.
+build --config=clang
+
+# Show test failures:
+test --test_output=errors
