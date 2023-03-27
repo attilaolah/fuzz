@@ -1,6 +1,7 @@
 """Repository rules for downloading all dependencies."""
 
 load(":http_archive.bzl", "http_archive")
+load("//toolchains:utils.bzl", "patch_files")
 
 def workspace_dependencies():
     """Set up dependencies of THIS workspace."""
@@ -90,4 +91,8 @@ def workspace_dependencies():
         urls = ["https://github.com/google/googletest/archive/refs/tags/v{version}.tar.gz"],
         strip_prefix = "googletest-{version}",
         build_file_content = None,
+        patch_cmds = patch_files({
+            "googletest/include/gtest/gtest-printers.h": "s/__cpp_char8_t/__cpp_lib_char8_t/g",
+            "googletest/src/gtest-printers.cc": "s/__cpp_char8_t/__cpp_lib_char8_t/g",
+        }),
     )

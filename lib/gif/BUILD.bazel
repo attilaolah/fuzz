@@ -9,10 +9,13 @@ make_lib(name = "gif")
 
 cc_test(
     name = "gif_test",
-    srcs = ["gif_test.cc"],
+    srcs = [
+        "gif_test.cc",
+        "testdata/64x64.gif.h",
+    ],
     deps = [
         ":gif",
         "@com_google_googletest//:gtest_main",
     ],
-
+    data = ["testdata/64x64.gif"],
 )
