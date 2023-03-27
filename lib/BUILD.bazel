@@ -1,0 +1,22 @@
+load("@bazel_skylib//:bzl_library.bzl", "bzl_library")
+load(":package_deps.bzl", "PACKAGE_DEPS")
+
+bzl_library(
+    name = "package",
+    srcs = ["package.bzl"],
+    visibility = ["//:__pkg__"],
+    deps = PACKAGE_DEPS,
+)
+
+bzl_library(
+    name = "defs",
+    srcs = ["defs.bzl"],
+    visibility = [":__subpackages__"],
+)
+
+bzl_library(
+    name = "http_archive",
+    srcs = ["http_archive.bzl"],
+    visibility = [":__subpackages__"],
+    deps = ["//:http_archive"],
+)

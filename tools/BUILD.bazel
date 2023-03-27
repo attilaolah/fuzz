@@ -1,0 +1,17 @@
+load("@bazel_skylib//:bzl_library.bzl", "bzl_library")
+
+package(default_visibility = ["//visibility:public"])
+
+sh_binary(
+    name = "update_deps",
+    srcs = ["update_deps.sh"],
+)
+
+bzl_library(
+    name = "package",
+    srcs = ["package.bzl"],
+    visibility = ["//:__pkg__"],
+    deps = [
+        "//tools/llvm:package",
+    ],
+)

@@ -1,0 +1,15 @@
+load("@io_bazel_rules_go//go:def.bzl", "go_library")
+
+go_library(
+    name = "version_info",
+    srcs = ["version_info.go"],
+    importpath = "github.com/attilaolah/fuzz/tools/version_info",
+    visibility = [
+        ":__subpackages__",
+        "//tools/write_me:__pkg__",
+    ],
+    deps = [
+        "@net_starlark_go//starlark",
+        "@org_golang_x_mod//semver",
+    ],
+)

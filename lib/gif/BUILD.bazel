@@ -1,0 +1,8 @@
+load("//lib:lib.bzl", "lib_package")
+load("//toolchains/make:make.bzl", "make_lib")
+
+package(default_visibility = ["//:__subpackages__"])
+
+lib_package()
+
+make_lib(name = "gif")

@@ -1,0 +1,32 @@
+load("//lib:lib.bzl", "lib_package")
+load("//toolchains:utils.bzl", "no_error")
+load("//toolchains/make:configure.bzl", "configure_make_lib", "lib_source")
+load("//tools/archive_symbols:archive_symbols.bzl", "static_symbols")
+
+package(default_visibility = ["//lib:__subpackages__"])
+
+lib_package()
+
+configure_make_lib(
+    name = "gomp",
+    configure_command = "libgomp/configure",
+    configure_options = [
+        # keep sorted
+        "--disable-multilib",
+        "--disable-shared",
+        "--enable-static",
+    ],
+    env = {"CFLAGS": no_error([
+        # keep sorted
+        "enum-conversion",
+        "implicit-function-declaration",
+        "incompatible-pointer-types",
+        "int-conversion",
+    ])},
+    lib_source = lib_source("gcc"),
+)
+
+static_symbols(
+    name = "gcc_symbols",
+    srcs = glob(["symbols/lib*.json"]),
+)
