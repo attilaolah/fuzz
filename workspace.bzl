@@ -82,3 +82,12 @@ def workspace_dependencies():
         urls = ["https://github.com/bazelbuild/rules_rust/releases/download/{version}/rules_rust-v{version}.tar.gz"],
         build_file_content = None,
     )
+
+    http_archive(
+        name = "com_google_googletest",
+        version = "1.13.0",
+        sha256 = "ad7fdba11ea011c1d925b3289cf4af2c66a352e18d4c7264392fead75e919363",
+        urls = ["https://github.com/google/googletest/archive/refs/tags/v{version}.tar.gz"],
+        strip_prefix = "googletest-{version}",
+        build_file_content = None,
+    )
