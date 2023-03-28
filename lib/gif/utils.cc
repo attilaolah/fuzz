@@ -186,8 +186,12 @@ auto proto_to_gif(const Gif &proto) -> std::vector<uint8_t> {
       // A valid code size.
       gif.push_back((desc.code_size() % 7) + 1);
 
-      // TODO: Write (height * width) bytes of pixel data.
-      // This needs to be LZ-encoded for a valid image, maybe parse some existing data.
+      // Write (height * width) bytes of pixel data.
+      // TODO: This needs to be LZ-encoded for a valid image, maybe parse some
+      // existing data or try to compress it using the giflib functions.
+      for (const uint8_t byte : desc.content()) {
+        gif.push_back(byte);
+      }
       continue;
     }
 
