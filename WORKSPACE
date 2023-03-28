@@ -9,14 +9,6 @@ workspace_dependencies()
 
 register_toolchains("//toolchains/cc:all")
 
-## C/C++ dependencies (foreign toolchains).
-
-load("@rules_foreign_cc//foreign_cc:repositories.bzl", "rules_foreign_cc_dependencies")
-
-rules_foreign_cc_dependencies(
-    register_preinstalled_tools = False,
-)
-
 ## Go dependencies & toolchain.
 
 load("@io_bazel_rules_go//go:deps.bzl", "go_register_toolchains", "go_rules_dependencies")
@@ -328,6 +320,14 @@ rules_fuzzing_dependencies()
 load("@rules_fuzzing//fuzzing:init.bzl", "rules_fuzzing_init")
 
 rules_fuzzing_init()
+
+## C/C++ dependencies (foreign toolchains).
+
+load("@rules_foreign_cc//foreign_cc:repositories.bzl", "rules_foreign_cc_dependencies")
+
+rules_foreign_cc_dependencies(
+    register_preinstalled_tools = False,
+)
 
 ## C/C++ dependencies (external).
 
