@@ -38,6 +38,31 @@ cc_fuzz_test(
     ],
 )
 
+cc_fuzz_test(
+    name = "decode_proto_fuzz_test",
+    size = "small",
+    srcs = ["decode_proto_fuzz_test.cc"],
+    corpus = glob([
+        "testdata/*.textproto",
+    ]),
+    deps = [
+        ":fuzz_cc_proto",
+        ":gif",
+        ":utils",
+        "//lib/protobuf_mutator",
+    ],
+)
+
+proto_library(
+    name = "fuzz_proto",
+    srcs = ["fuzz.proto"],
+)
+
+cc_proto_library(
+    name = "fuzz_cc_proto",
+    deps = [":fuzz_proto"],
+)
+
 cc_library(
     name = "testdata",
     testonly = 1,
@@ -48,7 +73,10 @@ cc_library(
     name = "utils",
     srcs = ["utils.cc"],
     hdrs = ["utils.h"],
-    deps = [":gif"],
+    deps = [
+        ":fuzz_cc_proto",
+        ":gif",
+    ],
 )
 
 sh_binary(

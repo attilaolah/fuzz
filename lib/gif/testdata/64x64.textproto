@@ -1,0 +1,14 @@
+version: GIF89
+
+width: 64
+height: 64
+
+colour_map {
+  colour_resolution: 6
+  bits_per_pixel: 7
+  is_sorted: false
+}
+background_colour: 0
+aspect_ratio: 0
+
+blocks { terminator: true }

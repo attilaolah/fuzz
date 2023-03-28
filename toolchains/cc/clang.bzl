@@ -83,10 +83,13 @@ def clang_toolchain(name):
         compile_flags = [
             "-U_FORTIFY_SOURCE",
             "-Wall",
-            "-Wextra",
             "-fcolor-diagnostics",
             "-fno-omit-frame-pointer",
             "-fstack-protector",
+
+            # Some projects set -Werror while having warnings with -Wextra.
+            # The combination of these two flags breaks e.g. //lib/protobuf_mutator.
+            #"-Wextra",
 
             # Would be nice, but rules_go fails to compile.
             #"-pedantic",

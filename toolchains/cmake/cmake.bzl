@@ -5,8 +5,7 @@ Contains a convenience macro that wraps cmake() from
 """
 
 load("@rules_foreign_cc//foreign_cc:cmake.bzl", "cmake")
-load("//lib:cache_entries.bzl", "include_dir_key", "library_key")
-load("//lib:defs.bzl", "dep_spec")
+load("//lib:defs.bzl", "include_dir", "library_path")
 load("//toolchains/make:configure.bzl", _lib_source = "lib_source")
 
 def cmake_lib(
@@ -49,11 +48,10 @@ def cache_entries(*originals, upcase = True, prefix_all = "", deps = None, **kwa
     remap = result.pop("remap", {})
 
     for dep, spec in (deps or {}).items():
-        spec = spec or dep_spec(dep)
-        if "include_dir" in spec:
-            result[include_dir_key(dep)] = spec["include_dir"]
-        if "library" in spec:
-            result[library_key(dep)] = spec["library"]
+        prefix = spec.get("prefix", "")
+        suffix = spec.get("suffix", "")
+        result["{}{}{}_library".format(prefix, dep, suffix)] = spec.get("library", library_path(dep))
+        result["{}{}{}_include_dir".format(prefix, dep, suffix)] = spec.get("include_dir", include_dir(dep))
 
     for new, old in remap.items():
         result[new] = result.pop(old)
