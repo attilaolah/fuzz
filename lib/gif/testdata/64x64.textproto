@@ -11,4 +11,4 @@ colour_map {
 background_colour: 0
 aspect_ratio: 0
 
-blocks { terminator: true }
+blocks { terminator {} }

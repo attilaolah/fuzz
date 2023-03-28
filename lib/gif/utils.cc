@@ -39,7 +39,9 @@ auto proto_to_gif(const Gif &proto) -> std::vector<uint8_t> {
     break;
   case Gif::UNKNOWN:
   default:
-    break; // No header. This will be an invalid image.
+    // No header. This will be an invalid image.
+    // TODO: Maybe enforce a valid image no matter what?
+    break;
   }
 
   // Height & width.
@@ -76,7 +78,7 @@ auto proto_to_gif(const Gif &proto) -> std::vector<uint8_t> {
   if (proto.has_colour_map()) {
     uint8_t colour_count = 1 << ((cm.bits_per_pixel() & 0b111) + 1);
     for (size_t i = 0; i < colour_count; i++) {
-      // TODO: Maybe provide a colour palette?
+      // TODO: Maybe provide a colour palette, e.g. via a bytes field?
       gif.push_back(0x00); // R
       gif.push_back(0x00); // G
       gif.push_back(0x00); // B
@@ -88,24 +90,51 @@ auto proto_to_gif(const Gif &proto) -> std::vector<uint8_t> {
       // EXTENSION_INTRODUCER
       gif.push_back(0x21);
 
-      // Extension blocks:
-      // - 1 byte extension code ("extension function")
+      const auto &ext = block.ext();
+      const std::string &content = ext.content();
+
+      // Extension (function) code:
+      using Ext = Gif::Block::Extension;
+      switch (ext.code()) {
+      case Ext::PLAIN_TEXT:
+        gif.push_back(0x01);
+        break;
+      case Ext::COMMENT:
+        gif.push_back(0xfe);
+        break;
+      case Ext::GRAPHICS:
+        gif.push_back(0xf9);
+        break;
+      case Ext::APPLICATION:
+        gif.push_back(0xff);
+        break;
+      case Ext::UNKNOWN:
+      default:
+        gif.push_back(0x00);
+        break;
+      }
+
+      // Extension block content:
       // - 1 byte extension length
       // - 0-255 byte extension data
-      //
-      // Extension function codes:
-      // - CONTINUE_EXT_FUNC_CODE    (0x00)
-      // - COMMENT_EXT_FUNC_CODE     (0xfe)
-      // - GRAPHICS_EXT_FUNC_CODE    (0xf9)
-      // - PLAINTEXT_EXT_FUNC_CODE   (0x01)
-      // - APPLICATION_EXT_FUNC_CODE (0xff)
-      // - Other extension types may be ignored?
-      //
-      // The "continuation" code seems to indicate that the next extension block
-      // is a continuation of the previous one. This should allow us to encode
-      // arbitrarily long data in an extensino block, using continuations.
-      //
-      // Extension blocks are only applied to the next image that is read.
+      if (content.empty()) {
+        gif.push_back(0x00);
+        continue;
+      }
+      for (size_t i = 0; i < content.size(); i++) {
+        if ((i & 0xff) == 0) {
+          if (i != 0) {
+            // This is not the first chunk of 255 bytes, i.e. a continuation.
+            // Write a CONTINUE_EXT_FUNC_CODE marker to signal the next block.
+            gif.push_back(0x00);
+          }
+          // Before writing the first byte, write how many bytes there are.
+          gif.push_back(std::min(content.size() - i, 0xffUL) & 0xff);
+        }
+        gif.push_back(content[i]);
+      }
+
+      // NOTE: Extension blocks are only applied to the next image that is read.
       continue;
     }
 
@@ -113,19 +142,52 @@ auto proto_to_gif(const Gif &proto) -> std::vector<uint8_t> {
       // DESCRIPTOR_INTRODUCER
       gif.push_back(0x2c);
 
-      // Image descriptor blocks:
-      // [left, top, width, height] = 2 bytes each (unsigned).
-      // Max width * height should not exceed uintptr UINTPTR_MAX.
-      // - 1 byte:
-      // - 10000000 -> interlaced
-      // - 00001000 -> local colour map exists
-      // - 00000111 -> bits per pixel (see above for an explanation)
-      //
-      // Next, write the local colour map.
-      // Based on the bits-per-pixel value above, write 3 bytes for each colour.
-      //
-      // 1 byte: code size, [0-8] inclusive
-      // Then (height * width) bytes of pixel data.
+      const auto &desc = block.desc();
+
+      // Image position & dimensions.
+      uint16_t l = desc.left() & 0xffff;
+      uint16_t t = desc.top() & 0xffff;
+      uint16_t w = desc.width() & 0xffff;
+      uint16_t h = desc.height() & 0xffff;
+      while (w * h > 0 && w > (std::numeric_limits<int32_t>::max() / h)) {
+        if (w > h) {
+          w /= 2;
+        } else {
+          h /= 2;
+        }
+      }
+      gif.push_back(l & 0xff);
+      gif.push_back(l >> 8);
+      gif.push_back(t & 0xff);
+      gif.push_back(t >> 8);
+      gif.push_back(w & 0xff);
+      gif.push_back(w >> 8);
+      gif.push_back(h & 0xff);
+      gif.push_back(h >> 8);
+
+      uint8_t byte = desc.interlaced() ? 0x80 : 0x00; // 10000000
+      if (desc.has_colour_map()) {
+        const auto &cm = desc.colour_map();
+        byte |= 0b1000;                      // 00001000
+        byte |= cm.bits_per_pixel() & 0b111; // 00000111
+        gif.push_back(byte);
+
+        uint8_t colour_count = 1 << ((cm.bits_per_pixel() & 0b111) + 1);
+        for (size_t i = 0; i < colour_count; i++) {
+          // TODO: Maybe provide a colour palette, e.g. via a bytes field?
+          gif.push_back(0x00); // R
+          gif.push_back(0x00); // G
+          gif.push_back(0x00); // B
+        }
+      } else {
+        gif.push_back(byte);
+      }
+
+      // A valid code size.
+      gif.push_back((desc.code_size() % 7) + 1);
+
+      // TODO: Write (height * width) bytes of pixel data.
+      // This needs to be LZ-encoded for a valid image, maybe parse some existing data.
       continue;
     }
 
