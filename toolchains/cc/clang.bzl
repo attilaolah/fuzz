@@ -83,8 +83,7 @@ def clang_toolchain(name):
         compile_flags = [
             "-U_FORTIFY_SOURCE",
             "-Wall",
-            "-Wthread-safety",
-            "-Wself-assign",
+            "-Wextra",
             "-fcolor-diagnostics",
             "-fno-omit-frame-pointer",
             "-fstack-protector",
