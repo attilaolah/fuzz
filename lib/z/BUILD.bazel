@@ -8,8 +8,5 @@ lib_package()
 configure_make_lib(
     name = "z",
     configure_options = ["--static"],
-    env = {
-        # Needed by //lib/python:runtime?
-        "CFLAGS": "-fPIC",
-    },
+    env = {"CFLAGS": "-fPIC"},
 )

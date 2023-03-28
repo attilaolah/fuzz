@@ -6,7 +6,10 @@ package(default_visibility = ["//:__subpackages__"])
 
 lib_package()
 
-make_lib(name = "gif")
+make_lib(
+    name = "gif",
+    env = {"CFLAGS": "-fPIC"},
+)
 
 cc_test(
     name = "gif_test",
