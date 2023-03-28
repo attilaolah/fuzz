@@ -1,5 +1,6 @@
 load("//lib:lib.bzl", "lib_package")
 load("//toolchains/make:make.bzl", "make_lib")
+load("@rules_fuzzing//fuzzing:cc_defs.bzl", "cc_fuzz_test")
 
 package(default_visibility = ["//:__subpackages__"])
 
@@ -9,13 +10,36 @@ make_lib(name = "gif")
 
 cc_test(
     name = "gif_test",
-    srcs = [
-        "gif_test.cc",
-        "testdata/64x64.gif.h",
-    ],
+    size = "small",
+    srcs = ["gif_test.cc"],
+    data = ["testdata/64x64.gif"],
     deps = [
         ":gif",
+        ":testdata",
+        ":utils",
         "@com_google_googletest//:gtest_main",
     ],
-    data = ["testdata/64x64.gif"],
+)
+
+cc_fuzz_test(
+    name = "decode_fuzz_test",
+    size = "small",
+    srcs = ["decode_fuzz_test.cc"],
+    deps = [
+        ":gif",
+        ":utils",
+    ],
+)
+
+cc_library(
+    name = "testdata",
+    testonly = 1,
+    hdrs = ["testdata/64x64.gif.h"],
+)
+
+cc_library(
+    name = "utils",
+    srcs = ["utils.cc"],
+    hdrs = ["utils.h"],
+    deps = [":gif"],
 )

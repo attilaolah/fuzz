@@ -1,3 +1,4 @@
+#include <algorithm>
 #include <cstdint>
 #include <cstring>
 
@@ -5,29 +6,12 @@
 #include <gtest/gtest.h>
 
 #include "testdata/64x64.gif.h"
+#include "utils.h"
 
 namespace {
 using ::testdata::k64x64gif;
-
-// NOTE: We should use std::span, but
-// getting it to compile with all the deps is painful.
-struct Span {
-  const uint8_t *data;
-  size_t size;
-};
-
-auto read_span(GifFileType *gif, GifByteType *dst, int size) -> int {
-  auto src = static_cast<Span *>(gif->UserData);
-  if (src == nullptr) {
-    return 0;
-  }
-
-  size = std::min(static_cast<int>(src->size), size);
-  std::memcpy(dst, src->data, size);
-  src->data += size;
-  src->size -= size;
-  return size;
-}
+using ::utils::read_span;
+using ::utils::Span;
 
 // Just to make sure the headers are accessible.
 TEST(GifTest, Version) { EXPECT_GE(GIFLIB_MAJOR, 5); }

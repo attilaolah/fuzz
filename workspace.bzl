@@ -96,3 +96,12 @@ def workspace_dependencies():
             "googletest/src/gtest-printers.cc": "s/__cpp_char8_t/__cpp_lib_char8_t/g",
         }),
     )
+
+    http_archive(
+        name = "rules_fuzzing",
+        version = "0.3.2",
+        sha256 = "d9002dd3cd6437017f08593124fdd1b13b3473c7b929ceb0e60d317cb9346118",
+        urls = ["https://github.com/bazelbuild/{name}/archive/v{version}.zip"],
+        strip_prefix = "{name}-{version}",
+        build_file_content = None,
+    )
