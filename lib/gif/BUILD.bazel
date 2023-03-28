@@ -25,6 +25,7 @@ cc_fuzz_test(
     name = "decode_fuzz_test",
     size = "small",
     srcs = ["decode_fuzz_test.cc"],
+    corpus = glob(["testdata/*.gif"]),
     deps = [
         ":gif",
         ":utils",
