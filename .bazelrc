@@ -3,17 +3,15 @@
 # Allow local workspace config to select a different default:
 try-import %workspace%/.bazelrc.local
 
+# All fuzzer configs are defined here:
+import %workspace%/.bazelrc.fuzzer
+
 # Crosstool setup:
 build:clang --crosstool_top=//toolchains
 
 # Use the "clang" config by default.
 # This will use the //toolchains crosstool top, as specified above.
 build --config=clang
-
-# Define the --config=asan-libfuzzer configuration.
-build:asan-libfuzzer --@rules_fuzzing//fuzzing:cc_engine=@rules_fuzzing//fuzzing/engines:libfuzzer
-build:asan-libfuzzer --@rules_fuzzing//fuzzing:cc_engine_instrumentation=libfuzzer
-build:asan-libfuzzer --@rules_fuzzing//fuzzing:cc_engine_sanitizer=asan
 
 # Show test failures:
 test --test_output=errors
