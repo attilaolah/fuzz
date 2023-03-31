@@ -24,6 +24,7 @@ def make_lib(
         lib_source = _lib_source(name)
     if out_static_libs == None:
         out_static_libs = ["lib{}.a".format(name)]
+    kwargs.setdefault("args", []).extend(["--environment-overrides"])
 
     make(
         name = name,

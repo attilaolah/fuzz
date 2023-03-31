@@ -1,8 +1,85 @@
 load("//lib:lib.bzl", "lib_package")
 load("//toolchains/make:make.bzl", "make_lib")
+load("@rules_fuzzing//fuzzing:cc_defs.bzl", "cc_fuzz_test")
 
 package(default_visibility = ["//:__subpackages__"])
 
 lib_package()
 
-make_lib(name = "gif")
+make_lib(
+    name = "gif",
+    env = {"CFLAGS": "-fPIC"},
+)
+
+cc_test(
+    name = "gif_test",
+    size = "small",
+    srcs = ["gif_test.cc"],
+    data = ["testdata/64x64.gif"],
+    deps = [
+        ":gif",
+        ":testdata",
+        ":utils",
+        "@com_google_googletest//:gtest_main",
+    ],
+)
+
+cc_fuzz_test(
+    name = "decode_fuzz_test",
+    size = "small",
+    srcs = ["decode_fuzz_test.cc"],
+    corpus = glob([
+        "corpus/*.gif",
+        "testdata/*.gif",
+    ]),
+    deps = [
+        ":gif",
+        ":utils",
+    ],
+)
+
+cc_fuzz_test(
+    name = "decode_proto_fuzz_test",
+    size = "small",
+    srcs = ["decode_proto_fuzz_test.cc"],
+    corpus = glob([
+        "testdata/*.textproto",
+    ]),
+    deps = [
+        ":fuzz_cc_proto",
+        ":gif",
+        ":utils",
+        "//lib/protobuf_mutator",
+    ],
+)
+
+proto_library(
+    name = "fuzz_proto",
+    srcs = ["fuzz.proto"],
+)
+
+cc_proto_library(
+    name = "fuzz_cc_proto",
+    deps = [":fuzz_proto"],
+)
+
+cc_library(
+    name = "testdata",
+    testonly = 1,
+    hdrs = ["testdata/64x64.gif.h"],
+)
+
+cc_library(
+    name = "utils",
+    srcs = ["utils.cc"],
+    hdrs = ["utils.h"],
+    deps = [
+        ":fuzz_cc_proto",
+        ":gif",
+    ],
+)
+
+sh_binary(
+    name = "update_corpus",
+    srcs = ["update_corpus.sh"],
+)

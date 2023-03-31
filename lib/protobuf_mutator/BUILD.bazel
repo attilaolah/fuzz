@@ -1,0 +1,36 @@
+load("//lib:defs.bzl", "static_lib")
+load("//lib:lib.bzl", "lib_package")
+load("//toolchains:utils.bzl", "no_error")
+load("//toolchains/cmake:cmake.bzl", "cache_entries", "cmake_lib")
+
+lib_package()
+
+cmake_lib(
+    name = "protobuf_mutator",
+    cache_entries = cache_entries(
+        lib_proto_mutator_fuzzer_libraries = "libfuzzer",
+        lib_proto_mutator_testing = False,
+        deps = {
+            "lzma": {"prefix": "lib"},
+            "z": {"suffix": "lib"},
+        },
+    ),
+    out_static_libs = [static_lib(name) for name in [
+        "protobuf-mutator",
+        "protobuf-mutator-libfuzzer",
+    ]],
+    visibility = ["//lib:__subpackages__"],
+    deps = [
+        "//lib/lzma",
+        "//lib/z",
+        "@com_google_protobuf//:protobuf",
+        "@com_google_protobuf//:protobuf_headers",
+    ],
+)
+
+filegroup(
+    name = "headers",
+    srcs = [":protobuf_mutator"],
+    output_group = "include",
+    visibility = ["//lib:__subpackages__"],
+)

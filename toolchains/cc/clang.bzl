@@ -83,11 +83,16 @@ def clang_toolchain(name):
         compile_flags = [
             "-U_FORTIFY_SOURCE",
             "-Wall",
-            "-Wthread-safety",
-            "-Wself-assign",
             "-fcolor-diagnostics",
             "-fno-omit-frame-pointer",
             "-fstack-protector",
+
+            # Some projects set -Werror while having warnings with -Wextra.
+            # The combination of these two flags breaks e.g. //lib/protobuf_mutator.
+            #"-Wextra",
+
+            # Would be nice, but rules_go fails to compile.
+            #"-pedantic",
         ],
         compiler = "clang",
         coverage_compile_flags = ["--coverage"],
@@ -95,9 +100,10 @@ def clang_toolchain(name):
         cpu = "k8",
         cxx_builtin_include_directories = [
             # TODO: Implement a sandboxed builtin_sysroot!
+            # This should be possible once https://github.com/bazelbuild/bazel/issues/4605 is fixed.
             "/usr/include",
         ],
-        cxx_flags = ["-std=c++17"],
+        cxx_flags = ["-std=c++20"],
         dbg_compile_flags = ["-g"],
         host_system_name = "local",
         link_flags = [

@@ -1,14 +1,15 @@
 """Repository rules for downloading all dependencies."""
 
 load(":http_archive.bzl", "http_archive")
+load("//toolchains:utils.bzl", "patch_files")
 
 def workspace_dependencies():
     """Set up dependencies of THIS workspace."""
     http_archive(
         name = "rules_foreign_cc",
-        version = "9fc3411bb506de1e0d1fa91db0dbf7712d1028ae",
+        version = "0.9.0",
         urls = ["https://github.com/bazelbuild/{name}/archive/{version}.tar.gz"],
-        sha256 = "0163c5a8ea65e8b100933b8ad1436d928e2107672c06732599f04174aa2afd5a",
+        sha256 = "2a4d07cd64b0719b39a7c12218a3e507672b82a97b98c6a89d38565894cf7c51",
         strip_prefix = "{name}-{version}",
         build_file_content = None,
     )
@@ -59,7 +60,7 @@ def workspace_dependencies():
 
     http_archive(
         name = "com_google_protobuf",
-        version = "3.19.4",  # This should match VERSION from //lib/protobuf:package.bzl.
+        version = "3.19.4",
         urls = ["https://github.com/protocolbuffers/protobuf/archive/v3.19.4.tar.gz"],
         sha256 = "3bd7828aa5af4b13b99c191e8b1e884ebfa9ad371b0ce264605d347f135d2568",
         strip_prefix = "protobuf-{version}",
@@ -80,5 +81,27 @@ def workspace_dependencies():
         version = "0.14.0",
         sha256 = "dd79bd4e2e2adabae738c5e93c36d351cf18071ff2acf6590190acf4138984f6",
         urls = ["https://github.com/bazelbuild/rules_rust/releases/download/{version}/rules_rust-v{version}.tar.gz"],
+        build_file_content = None,
+    )
+
+    http_archive(
+        name = "com_google_googletest",
+        version = "1.13.0",
+        sha256 = "ad7fdba11ea011c1d925b3289cf4af2c66a352e18d4c7264392fead75e919363",
+        urls = ["https://github.com/google/googletest/archive/refs/tags/v{version}.tar.gz"],
+        strip_prefix = "googletest-{version}",
+        build_file_content = None,
+        patch_cmds = patch_files({
+            "googletest/include/gtest/gtest-printers.h": "s/__cpp_char8_t/__cpp_lib_char8_t/g",
+            "googletest/src/gtest-printers.cc": "s/__cpp_char8_t/__cpp_lib_char8_t/g",
+        }),
+    )
+
+    http_archive(
+        name = "rules_fuzzing",
+        version = "0.3.2",
+        sha256 = "d9002dd3cd6437017f08593124fdd1b13b3473c7b929ceb0e60d317cb9346118",
+        urls = ["https://github.com/bazelbuild/{name}/archive/v{version}.zip"],
+        strip_prefix = "{name}-{version}",
         build_file_content = None,
     )

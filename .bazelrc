@@ -3,6 +3,9 @@
 # Allow local workspace config to select a different default:
 try-import %workspace%/.bazelrc.local
 
+# All fuzzer configs are defined here:
+import %workspace%/.bazelrc.fuzzer
+
 # Crosstool setup:
 build:clang --crosstool_top=//toolchains
 
