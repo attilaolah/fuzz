@@ -9,7 +9,6 @@ and CMake macros.
 
 load("@rules_foreign_cc//foreign_cc:configure.bzl", "configure_make")
 load("//lib:defs.bzl", "repo_name")
-load("//tools/archive_symbols:archive_symbols.bzl", "archive_symbols")
 
 def configure_make_lib(
         name,
@@ -24,10 +23,6 @@ def configure_make_lib(
         parameters.
       lib_source: Passed on to configure_make(). Guessed from name.
       out_static_libs: Passed on to configure_make(). Guessed from name.
-      ignore_undefined_symbols: Whether to ignore undefined symbols. If False,
-        any undefined symbols is the archive that are not provided by any of
-        the dependencies will cause a build error for the archive symbols
-        target.
       **kwargs: Passed no configure_make().
     """
     if lib_source == None:
@@ -41,12 +36,6 @@ def configure_make_lib(
         lib_source = lib_source,
         out_static_libs = out_static_libs,
         **kwargs
-    )
-
-    archive_symbols(
-        archive = name,
-        deps = kwargs.get("deps", []),
-        strict = not ignore_undefined_symbols,
     )
 
 def lib_source(lib_name):

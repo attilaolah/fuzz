@@ -8,7 +8,6 @@ load("@rules_foreign_cc//foreign_cc:cmake.bzl", "cmake")
 load("//lib:cache_entries.bzl", "include_dir_key", "library_key")
 load("//lib:defs.bzl", "dep_spec")
 load("//toolchains/make:configure.bzl", _lib_source = "lib_source")
-load("//tools/archive_symbols:archive_symbols.bzl", "archive_symbols")
 
 def cmake_lib(
         name,
@@ -25,10 +24,6 @@ def cmake_lib(
       out_static_libs: Passed on to cmake(). Guessed from name.
       cache_entries: Convert True/False to "ON"/"OFF", then passed on to
         cmake().
-      ignore_undefined_symbols: Whether to ignore undefined symbols. If False,
-        any undefined symbols is the archive that are not provided by any of
-        the dependencies will cause a build error for the archive symbols
-        target.
       **kwargs: Passed on to cmake().
     """
     if lib_source == None:
@@ -43,12 +38,6 @@ def cmake_lib(
         lib_source = lib_source,
         out_static_libs = out_static_libs,
         **kwargs
-    )
-
-    archive_symbols(
-        archive = name,
-        deps = kwargs.get("deps", []),
-        strict = not ignore_undefined_symbols,
     )
 
 def cache_entries(*originals, upcase = True, prefix_all = "", deps = None, **kwargs):
