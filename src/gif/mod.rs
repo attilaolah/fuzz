@@ -1,5 +1,6 @@
 use std::ffi::{CStr, CString};
 use std::fs;
+use std::slice::from_raw_parts;
 
 use clap::Parser;
 
@@ -11,6 +12,7 @@ use cc::DGifSlurp;
 use cc::GifColorType;
 use cc::GifErrorString;
 use cc::GifFileType;
+use cc::SavedImage;
 use cc::D_GIF_SUCCEEDED;
 use cc::GIF87_STAMP;
 use cc::GIF89_STAMP;
@@ -61,34 +63,51 @@ impl Args {
         proto.height = gif.SHeight.try_into()?;
 
         if !gif.SColorMap.is_null() {
-            let val: ColorMapObject = unsafe { *gif.SColorMap };
-            let mut cmap = pb::ColourMap::new();
-            cmap.present = true;
-            cmap.colour_resolution = log_2(val.ColorCount.try_into()?);
-            cmap.bits_per_pixel = val.BitsPerPixel.try_into()?;
-            cmap.is_sorted = val.SortFlag;
-
-            if self.zero_colour {
-                cmap.colours = Some(pb::ColourMap_oneof_colours::zeros(val.ColorCount.try_into()?));
-            } else {
-                let mut rgb_vals = pb::RGBValues::new();
-                for i in (0 as usize)..val.ColorCount.try_into()? {
-                    let c: GifColorType = unsafe { *val.Colors.add(i) };
-                    let mut rgb = pb::RGB::new();
-                    (rgb.r, rgb.g, rgb.b) = (c.Red.into(), c.Green.into(), c.Blue.into());
-                    rgb_vals.values.push(rgb);
-                }
-                cmap.colours = Some(pb::ColourMap_oneof_colours::values(rgb_vals));
-            }
-            proto.set_colour_map(cmap);
+            proto.set_colour_map(colour_map(unsafe { *gif.SColorMap }, self.zero_colour)?);
         }
 
         proto.background_colour = gif.SBackGroundColor.try_into()?;
         proto.aspect_ratio = gif.AspectByte.into();
 
-        proto.seed = self.seed;
+        for i in (0 as usize)..gif.ImageCount.try_into()? {
+            let val: SavedImage = unsafe { *gif.SavedImages.add(i) };
 
-        // println!("{:#?}", &gif);
+            // TODO: Extensions!
+
+            let mut desc = pb::ImageDescriptor::new();
+            desc.top = val.ImageDesc.Top.try_into()?;
+            desc.left = val.ImageDesc.Left.try_into()?;
+            desc.width = val.ImageDesc.Width.try_into()?;
+            desc.height = val.ImageDesc.Height.try_into()?;
+            desc.interlaced = val.ImageDesc.Interlace;
+
+            if !val.ImageDesc.ColorMap.is_null() {
+                desc.set_colour_map(colour_map(
+                    unsafe { *val.ImageDesc.ColorMap },
+                    self.zero_colour,
+                )?);
+            }
+
+            let size = desc.width * desc.height;
+            if self.zero_colour {
+                desc.set_zeros(size);
+            } else {
+                let mut data = Vec::with_capacity(size.try_into()?);
+                data.extend_from_slice(unsafe { from_raw_parts(val.RasterBits, size.try_into()?) });
+                desc.set_values(data);
+            }
+
+            let mut block = pb::Block::new();
+            block.value = Some(pb::Block_oneof_value::desc(desc));
+            proto.blocks.push(block);
+        }
+
+        let mut block = pb::Block::new();
+        let terminator = pb::Terminator::new();
+        block.value = Some(pb::Block_oneof_value::terminator(terminator));
+        proto.blocks.push(block);
+
+        proto.seed = self.seed;
 
         fs::write(
             path_or(&self.proto, "/dev/stdout"),
@@ -131,6 +150,32 @@ fn gif_close(gif: *mut GifFileType) -> Result<(), Error> {
     }
 
     Ok(())
+}
+
+fn colour_map(cmap: ColorMapObject, zeros: bool) -> Result<pb::ColourMap, Error> {
+    let mut proto = pb::ColourMap::new();
+    proto.present = true;
+    proto.colour_resolution = log_2(cmap.ColorCount.try_into()?);
+    proto.bits_per_pixel = cmap.BitsPerPixel.try_into()?;
+    proto.is_sorted = cmap.SortFlag;
+
+    if zeros {
+        proto.colours = Some(pb::ColourMap_oneof_colours::zeros(
+            cmap.ColorCount.try_into()?,
+        ));
+    } else {
+        let mut rgb_vals = pb::RGBValues::new();
+        for i in (0 as usize)..cmap.ColorCount.try_into()? {
+            let c: GifColorType = unsafe { *cmap.Colors.add(i) };
+
+            let mut rgb = pb::RGB::new();
+            (rgb.r, rgb.g, rgb.b) = (c.Red.into(), c.Green.into(), c.Blue.into());
+            rgb_vals.values.push(rgb);
+        }
+        proto.colours = Some(pb::ColourMap_oneof_colours::values(rgb_vals));
+    }
+
+    Ok(proto)
 }
 
 fn path_or<'a>(path: &'a str, dash: &'a str) -> &'a str {
