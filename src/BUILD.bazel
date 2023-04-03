@@ -1,0 +1,10 @@
+filegroup(
+    name = "src",
+    srcs = [
+        "lib.rs",
+        "error.rs",
+        "//src/bin",
+        "//src/gif",
+    ],
+    visibility = ["//:__pkg__"],
+)

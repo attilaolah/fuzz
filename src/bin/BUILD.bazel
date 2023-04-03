@@ -1,0 +1,11 @@
+filegroup(
+    name = "bin",
+    srcs = [":gif_to_proto"],
+    visibility = ["//src:__pkg__"],
+)
+
+filegroup(
+    name = "gif_to_proto",
+    srcs = ["gif_to_proto.rs"],
+    visibility = ["//:__pkg__"],
+)

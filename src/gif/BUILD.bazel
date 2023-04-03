@@ -1,0 +1,42 @@
+load("@rules_rust//bindgen:bindgen.bzl", "rust_bindgen")
+load("@rules_rust//proto:proto.bzl", "rust_proto_library")
+load("@rules_rust//rust:defs.bzl", "rust_library")
+
+filegroup(
+    name = "gif",
+    srcs = ["mod.rs"],
+    visibility = ["//src:__pkg__"],
+)
+
+proto_library(
+    name = "gif_proto",
+    srcs = ["gif.proto"],
+)
+
+rust_proto_library(
+    name = "gif_rust_proto",
+    deps = [":gif_proto"],
+    visibility = ["//:__pkg__"],
+)
+
+cc_library(
+    name = "gif_h",
+    hdrs = ["gif.h"],
+    deps = ["//lib/gif"],
+)
+
+rust_bindgen(
+    name = "gif_h_rs",
+    cc_lib = ":gif_h",
+    header = "gif.h",
+)
+
+rust_library(
+    name = "cc",
+    srcs = [
+        "cc.rs",
+        ":gif_h_rs",
+    ],
+    deps = ["//lib/gif"],
+    visibility = ["//:__pkg__"],
+)

@@ -74,6 +74,21 @@ load("@crate_index//:defs.bzl", "crate_repositories")
 
 crate_repositories()
 
+load("@rules_rust//proto:repositories.bzl", "rust_proto_repositories")
+
+rust_proto_repositories()
+
+load("@rules_rust//proto:transitive_repositories.bzl", "rust_proto_transitive_repositories")
+
+rust_proto_transitive_repositories()
+
+load("@rules_rust//bindgen:repositories.bzl", "rust_bindgen_dependencies", "rust_bindgen_register_toolchains")
+
+# TODO: Use Clang from this repo!
+rust_bindgen_dependencies()
+
+rust_bindgen_register_toolchains()
+
 ## Skylib dependencies.
 
 load("@bazel_skylib//:workspace.bzl", "bazel_skylib_workspace")

@@ -6,6 +6,5 @@ authors = ["Attila Oláh <attilaolah@gmail.com>"]
 readme = "README.md"
 edition = "2021"
 
-[lib]
-
 [dependencies]
+clap = { version = "4.1.6", features = ["derive"] }
