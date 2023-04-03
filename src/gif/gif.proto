@@ -1,62 +1,87 @@
 syntax = "proto3";
 
 message Gif {
-  enum Version {
-    UNKNOWN = 0;
-    GIF87 = 1; // GIF87_STAMP
-    GIF89 = 2; // GIF89_STAMP
-    // Special value that forces giflib to detect a GIF 89 version.
-    GIF99 = 3;
-  }
   Version version = 1;
 
   uint32 width = 2;  // 2 bytes
   uint32 height = 3; // 2 bytes
 
-  message ColourMap {
-    bool present = 1;
-    uint32 colour_resolution = 2; // 3 bits
-    uint32 bits_per_pixel = 3;    // 3 bits
-    bool is_sorted = 4;
-  }
   ColourMap colour_map = 4;
 
+  // NOTE: This should be at most (1 << colour_resolution).
+  // A good fuzzer would certainly try values outside that range :)
   uint32 background_colour = 5; // 1 byte
   uint32 aspect_ratio = 6;      // 1 byte
 
-  message Block {
-    message Extension {
-      enum Function {
-        UNKNOWN = 0;
-        PLAIN_TEXT = 1;
-        COMMENT = 2;
-        GRAPHICS = 3;
-        APPLICATION = 4;
-      }
-      Function code = 1;
-      bytes content = 2;
-    }
-    message Descriptor {
-      uint32 left = 1;   // 2 bytes
-      uint32 top = 2;    // 2 bytes
-      uint32 width = 3;  // 2 bytes
-      uint32 height = 4; // 2 bytes
-      bool interlaced = 5;
-
-      message ColourMap {
-        uint32 bits_per_pixel = 1; // 3 bits
-      }
-      ColourMap colour_map = 6;
-
-      uint32 code_size = 7; // 1 byte
-      bytes content = 8;
-    }
-    message Terminator {}
-    oneof block {
-      Extension ext = 1;
-      Descriptor desc = 2;
-      Terminator terminator = 3;
-    }
-  }
   repeated Block blocks = 7;
+
+  // Used for whenever a random value is needed.
+  // This makes the output deterministic, but allows the fuzzer to introduce
+  // randomness by modifying this seed value.
+  uint64 seed = 8;
+}
+
+enum Version {
+  ZEROS = 0; // 6 zero bytes
+  GIF87 = 1; // GIF87_STAMP ("GIF87a")
+  GIF89 = 2; // GIF89_STAMP ("GIF89a")
+  // Special value that forces giflib to detect a GIF 89 version.
+  GIF99 = 3; // "GIF99a"
+  // Random garbage.
+  RANDOM = 4;
+}
+
+message ColourMap {
+  bool present = 1;
+  uint32 colour_resolution = 2; // 3 bits
+  uint32 bits_per_pixel = 3;    // 3 bits
+  bool is_sorted = 4;
+  oneof colours {
+    RGBValues values = 5;
+    uint32 zeros = 6;
+    uint32 random = 7;
+  }
+}
+
+message RGB {
+  uint32 r = 1;
+  uint32 g = 2;
+  uint32 b = 3;
+}
+
+message RGBValues { repeated RGB values = 1; }
+
+message Block {
+  message Extension {
+    enum Function {
+      UNKNOWN = 0;
+      PLAIN_TEXT = 1;
+      COMMENT = 2;
+      GRAPHICS = 3;
+      APPLICATION = 4;
+    }
+    Function code = 1;
+    bytes content = 2;
+  }
+  message Descriptor {
+    uint32 left = 1;   // 2 bytes
+    uint32 top = 2;    // 2 bytes
+    uint32 width = 3;  // 2 bytes
+    uint32 height = 4; // 2 bytes
+    bool interlaced = 5;
+
+    message ColourMap {
+      uint32 bits_per_pixel = 1; // 3 bits
+    }
+    ColourMap colour_map = 6;
+
+    uint32 code_size = 7; // 1 byte
+    bytes content = 8;
+  }
+  message Terminator {}
+  oneof block {
+    Extension ext = 1;
+    Descriptor desc = 2;
+    Terminator terminator = 3;
+  }
 }
