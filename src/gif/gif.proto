@@ -25,10 +25,12 @@ enum Version {
   ZEROS = 0; // 6 zero bytes
   GIF87 = 1; // GIF87_STAMP ("GIF87a")
   GIF89 = 2; // GIF89_STAMP ("GIF89a")
+
   // Special value that forces giflib to detect a GIF 89 version.
   GIF99 = 3; // "GIF99a"
+
   // Random garbage.
-  RANDOM = 4;
+  RANDOM_VERSION = 4;
 }
 
 message ColourMap {
@@ -60,15 +62,19 @@ message Block {
 }
 
 message Extension {
-  enum Function {
-    UNKNOWN = 0;
-    PLAIN_TEXT = 1;
-    COMMENT = 2;
-    GRAPHICS = 3;
-    APPLICATION = 4;
-  }
   Function code = 1;
   bytes content = 2;
+}
+
+enum Function {
+  CONTINUATION = 0;
+  PLAIN_TEXT = 1;
+  COMMENT = 2;
+  GRAPHICS = 3;
+  APPLICATION = 4;
+
+  // Random byte.
+  RANDOM_FUNCTION = 5;
 }
 
 message ImageDescriptor {

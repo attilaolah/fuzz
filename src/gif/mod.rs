@@ -9,14 +9,20 @@ use cc::DGifCloseFile;
 use cc::DGifGetGifVersion;
 use cc::DGifOpenFileName;
 use cc::DGifSlurp;
+use cc::ExtensionBlock;
 use cc::GifColorType;
 use cc::GifErrorString;
 use cc::GifFileType;
 use cc::SavedImage;
+use cc::APPLICATION_EXT_FUNC_CODE;
+use cc::COMMENT_EXT_FUNC_CODE;
+use cc::CONTINUE_EXT_FUNC_CODE;
 use cc::D_GIF_SUCCEEDED;
 use cc::GIF87_STAMP;
 use cc::GIF89_STAMP;
 use cc::GIF_OK;
+use cc::GRAPHICS_EXT_FUNC_CODE;
+use cc::PLAINTEXT_EXT_FUNC_CODE;
 
 use crate::error::Error;
 
@@ -33,9 +39,9 @@ pub struct Args {
     #[arg(short, long, default_value = "-")]
     proto: String,
 
-    /// Whether to use zero colour values
+    /// Whether to zero out colour values and extension content
     #[arg(short, long, default_value_t = false)]
-    zero_colour: bool,
+    zeros: bool,
 
     /// Seed value
     #[arg(short, long, default_value_t = 0)]
@@ -63,7 +69,7 @@ impl Args {
         proto.height = gif.SHeight.try_into()?;
 
         if !gif.SColorMap.is_null() {
-            proto.set_colour_map(colour_map(unsafe { *gif.SColorMap }, self.zero_colour)?);
+            proto.set_colour_map(colour_map(unsafe { *gif.SColorMap }, self.zeros)?);
         }
 
         proto.background_colour = gif.SBackGroundColor.try_into()?;
@@ -72,7 +78,33 @@ impl Args {
         for i in (0 as usize)..gif.ImageCount.try_into()? {
             let val: SavedImage = unsafe { *gif.SavedImages.add(i) };
 
-            // TODO: Extensions!
+            for i in (0 as usize)..val.ExtensionBlockCount.try_into()? {
+                let val: ExtensionBlock = unsafe { *val.ExtensionBlocks.add(i) };
+
+                let mut ext = pb::Extension::new();
+                ext.code = if val.Function == CONTINUE_EXT_FUNC_CODE.try_into()? {
+                    pb::Function::CONTINUATION
+                } else if val.Function == PLAINTEXT_EXT_FUNC_CODE.try_into()? {
+                    pb::Function::PLAIN_TEXT
+                } else if val.Function == COMMENT_EXT_FUNC_CODE.try_into()? {
+                    pb::Function::COMMENT
+                } else if val.Function == GRAPHICS_EXT_FUNC_CODE.try_into()? {
+                    pb::Function::GRAPHICS
+                } else if val.Function == APPLICATION_EXT_FUNC_CODE.try_into()? {
+                    pb::Function::APPLICATION
+                } else {
+                    pb::Function::RANDOM_FUNCTION
+                };
+
+                let size: usize = val.ByteCount.try_into()?;
+                let mut data = Vec::with_capacity(size);
+                data.extend_from_slice(unsafe { from_raw_parts(val.Bytes, size) });
+                ext.set_content(data);
+
+                let mut block = pb::Block::new();
+                block.value = Some(pb::Block_oneof_value::ext(ext));
+                proto.blocks.push(block);
+            }
 
             let mut desc = pb::ImageDescriptor::new();
             desc.top = val.ImageDesc.Top.try_into()?;
@@ -82,14 +114,11 @@ impl Args {
             desc.interlaced = val.ImageDesc.Interlace;
 
             if !val.ImageDesc.ColorMap.is_null() {
-                desc.set_colour_map(colour_map(
-                    unsafe { *val.ImageDesc.ColorMap },
-                    self.zero_colour,
-                )?);
+                desc.set_colour_map(colour_map(unsafe { *val.ImageDesc.ColorMap }, self.zeros)?);
             }
 
             let size = desc.width * desc.height;
-            if self.zero_colour {
+            if self.zeros {
                 desc.set_zeros(size);
             } else {
                 let mut data = Vec::with_capacity(size.try_into()?);
