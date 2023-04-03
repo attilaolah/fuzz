@@ -38,17 +38,21 @@ impl Args {
         let mut proto = pb::Gif::new();
 
         let gif_version: &str;
+        let v87 = CString::from_vec_with_nul(GIF87_STAMP.to_vec())?;
+        let v89 = CString::from_vec_with_nul(GIF89_STAMP.to_vec())?;
         unsafe {
+            // NOTE: GIF version parsing seems to be broken.
+            // All images are parsed as gif89, unless DATA[GIF_VERSION_POS] = '9';
+            // This would seemingly be true for e.g. GIF9??, but not GIF89a, as expected.
             gif_version = CStr::from_ptr(DGifGetGifVersion(&mut gif)).to_str()?;
         }
-        proto.version =
-            if gif_version == CString::from_vec_with_nul(GIF87_STAMP.to_vec())?.to_str()? {
-                pb::Gif_Version::GIF87
-            } else if gif_version == CString::from_vec_with_nul(GIF89_STAMP.to_vec())?.to_str()? {
-                pb::Gif_Version::GIF89
-            } else {
-                pb::Gif_Version::UNKNOWN
-            };
+        proto.version = if gif_version == v87.to_str()? {
+            pb::Gif_Version::GIF87
+        } else if gif_version == v89.to_str()? {
+            pb::Gif_Version::GIF89
+        } else {
+            pb::Gif_Version::UNKNOWN
+        };
 
         fs::write(
             path_or(&self.proto, "/dev/stdout"),
