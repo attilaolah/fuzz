@@ -6,7 +6,7 @@
 #include <gtest/gtest.h>
 
 #include "span.h"
-#include "testdata/64x64.gif.h"
+#include "testdata.h"
 
 namespace gif {
 
@@ -21,10 +21,8 @@ TEST(GifTest, ReadFailed) {
 }
 
 TEST(GifTest, ReadSucceeded) {
-  Span span{
-      .data = testdata::k64x64gif.data(),
-      .size = testdata::k64x64gif.size(),
-  };
+  auto test_file = read_file("src/gif/testdata/64x64.gif");
+  Span span{.data = test_file.data(), .size = test_file.size()};
   int err;
 
   GifFileType *gif = DGifOpen(&span, &Span::read, &err);

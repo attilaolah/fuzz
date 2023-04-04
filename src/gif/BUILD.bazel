@@ -22,7 +22,6 @@ cc_proto_library(
     deps = [":gif_proto"],
 )
 
-
 rust_proto_library(
     name = "gif_rust_proto",
     deps = [":gif_proto"],
@@ -64,25 +63,35 @@ cc_test(
 
 cc_library(
     name = "from_proto",
-    hdrs = ["from_proto.h"],
     srcs = ["from_proto.cc"],
+    hdrs = ["from_proto.h"],
     deps = [
         ":gif_cc_proto",
         "//lib/gif",
     ],
 )
 
+cc_test(
+    name = "from_proto_test",
+    srcs = ["from_proto_test.cc"],
+    deps = [
+        ":from_proto",
+        ":testdata",
+        "@com_google_googletest//:gtest_main",
+    ],
+)
 
 cc_library(
     name = "testdata",
     testonly = 1,
-    hdrs = ["testdata/64x64.gif.h"],
+    srcs = ["testdata.cc"],
+    hdrs = ["testdata.h"],
 )
 
 cc_library(
     name = "span",
-    hdrs = ["span.h"],
     srcs = ["span.cc"],
+    hdrs = ["span.h"],
     deps = ["//lib/gif"],
 )
 

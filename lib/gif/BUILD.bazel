@@ -14,7 +14,7 @@ make_lib(
 package_group(
     name = "users",
     packages = [
-        "//src/gif",
         "//fuzzers/gif",
+        "//src/gif",
     ],
 )
