@@ -1,0 +1,31 @@
+load("@rules_fuzzing//fuzzing:cc_defs.bzl", "cc_fuzz_test")
+
+cc_fuzz_test(
+    name = "decode_fuzz_test",
+    size = "small",
+    srcs = ["decode_fuzz_test.cc"],
+    corpus = glob([
+        "corpus/*.gif",
+        "testdata/*.gif",
+    ]),
+    deps = [
+        "//lib/gif",
+        "//src/gif:span",
+    ],
+)
+
+cc_fuzz_test(
+    name = "decode_proto_fuzz_test",
+    size = "small",
+    srcs = ["decode_proto_fuzz_test.cc"],
+    corpus = glob([
+        "testdata/*.textproto",
+    ]),
+    deps = [
+        "//lib/gif",
+        "//lib/protobuf_mutator",
+        "//src/gif:from_proto",
+        "//src/gif:gif_cc_proto",
+        "//src/gif:span",
+    ],
+)

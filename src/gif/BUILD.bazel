@@ -2,13 +2,14 @@ load("@rules_rust//bindgen:bindgen.bzl", "rust_bindgen")
 load("@rules_rust//proto:proto.bzl", "rust_proto_library")
 load("@rules_rust//rust:defs.bzl", "rust_library")
 
+package(default_visibility = [":users"])
+
 filegroup(
     name = "gif",
     srcs = [
         "mod.rs",
         "to_proto.rs",
     ],
-    visibility = ["//src:__pkg__"],
 )
 
 proto_library(
@@ -16,9 +17,14 @@ proto_library(
     srcs = ["gif.proto"],
 )
 
+cc_proto_library(
+    name = "gif_cc_proto",
+    deps = [":gif_proto"],
+)
+
+
 rust_proto_library(
     name = "gif_rust_proto",
-    visibility = ["//src:__pkg__"],
     deps = [":gif_proto"],
 )
 
@@ -40,6 +46,50 @@ rust_library(
         "cc.rs",
         ":gif_h_rs",
     ],
-    visibility = ["//src:__pkg__"],
     deps = ["//lib/gif"],
+)
+
+cc_test(
+    name = "gif_test",
+    size = "small",
+    srcs = ["gif_test.cc"],
+    data = ["testdata/64x64.gif"],
+    deps = [
+        ":span",
+        ":testdata",
+        "//lib/gif",
+        "@com_google_googletest//:gtest_main",
+    ],
+)
+
+cc_library(
+    name = "from_proto",
+    hdrs = ["from_proto.h"],
+    srcs = ["from_proto.cc"],
+    deps = [
+        ":gif_cc_proto",
+        "//lib/gif",
+    ],
+)
+
+
+cc_library(
+    name = "testdata",
+    testonly = 1,
+    hdrs = ["testdata/64x64.gif.h"],
+)
+
+cc_library(
+    name = "span",
+    hdrs = ["span.h"],
+    srcs = ["span.cc"],
+    deps = ["//lib/gif"],
+)
+
+package_group(
+    name = "users",
+    packages = [
+        "//fuzzers/gif",
+        "//src",  # TODO: Resolve this dependency!
+    ],
 )
