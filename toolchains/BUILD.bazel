@@ -14,4 +14,5 @@ cc_toolchain_suite(
 bzl_library(
     name = "utils_bzl",
     srcs = ["utils.bzl"],
+    visibility = ["//:__subpackages__"],
 )
