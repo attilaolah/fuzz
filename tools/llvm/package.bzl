@@ -1,12 +1,15 @@
 """Workspace rule for downloading package dependencies."""
 
 load("//:http_archive.bzl", "http_archive")
-load("//:versions.bzl", "OS_VERSION")
 load("//toolchains:utils.bzl", "patch_files")
 
 VERSION = "16.0.0"
 VERSION_MMP = VERSION.split("-")[0]
 VERSION_ND = VERSION.replace("-", "")
+
+# Clang is only pre-built for Ubuntu 18.04 (for now).
+# It runs, however, in Ubuntu 22.04, as long as libtinfo5 is installed.
+OS_VERSION = "ubuntu-18.04"
 
 URL = "https://github.com/llvm/llvm-project/releases/download/llvmorg-{version}/clang+llvm-{version}-x86_64-linux-gnu-" + OS_VERSION + ".tar.xz"
 SHA256 = "2b8a69798e8dddeb57a186ecac217a35ea45607cb2b3cf30014431cff4340ad1"

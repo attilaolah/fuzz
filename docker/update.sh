@@ -16,5 +16,8 @@ echo "deb [arch=amd64] https://storage.googleapis.com/bazel-apt stable jdk1.8" >
 apt-get update
 apt-get --yes install bazel 2>&1
 
+# Install dependencies.
+apt-get --yes install python-is-python3 python3-distutils pypy-enum34 libtinfo5
+
 # Self-destruct.
 rm /etc/update.sh
