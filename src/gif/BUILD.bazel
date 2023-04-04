@@ -4,7 +4,10 @@ load("@rules_rust//rust:defs.bzl", "rust_library")
 
 filegroup(
     name = "gif",
-    srcs = ["mod.rs"],
+    srcs = [
+        "mod.rs",
+        "to_proto.rs",
+    ],
     visibility = ["//src:__pkg__"],
 )
 
