@@ -18,8 +18,3 @@ package_group(
         "//fuzzers/gif",
     ],
 )
-
-sh_binary(
-    name = "update_corpus",
-    srcs = ["update_corpus.sh"],
-)

@@ -29,3 +29,8 @@ cc_fuzz_test(
         "//src/gif:span",
     ],
 )
+
+sh_binary(
+    name = "update_corpus",
+    srcs = ["update_corpus.sh"],
+)
