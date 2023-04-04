@@ -61,13 +61,18 @@ crate_universe_dependencies(bootstrap = True)
 
 rust_analyzer_dependencies()
 
-load("@rules_rust//crate_universe:defs.bzl", "crates_repository")
+load("@rules_rust//crate_universe:defs.bzl", "crate", "crates_repository")
 
 crates_repository(
     name = "crate_index",
     cargo_lockfile = "//:Cargo.lock",
     lockfile = "//:Cargo.bazel.lock",
-    manifests = ["//:Cargo.toml"],
+    packages = {
+        "clap": crate.spec(
+            features = ["derive"],
+            version = "4.1.6",
+        ),
+    },
 )
 
 load("@crate_index//:defs.bzl", "crate_repositories")

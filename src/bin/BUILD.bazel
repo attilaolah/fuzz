@@ -1,11 +1,14 @@
-filegroup(
-    name = "bin",
-    srcs = [":gif_to_proto"],
-    visibility = ["//src:__pkg__"],
-)
+load("//:versions.bzl", "RUST_EDITION")
+load("@rules_rust//rust:defs.bzl", "rust_binary")
+load("@crate_index//:defs.bzl", "aliases", "all_crate_deps")
 
-filegroup(
+rust_binary(
     name = "gif_to_proto",
     srcs = ["gif_to_proto.rs"],
-    visibility = ["//:__pkg__"],
+    aliases = aliases(normal = True),
+    edition = RUST_EDITION,
+    deps = [
+        "//src",
+        "@crate_index//:clap",
+    ],
 )

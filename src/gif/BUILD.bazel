@@ -15,8 +15,8 @@ proto_library(
 
 rust_proto_library(
     name = "gif_rust_proto",
+    visibility = ["//src:__pkg__"],
     deps = [":gif_proto"],
-    visibility = ["//:__pkg__"],
 )
 
 cc_library(
@@ -37,6 +37,6 @@ rust_library(
         "cc.rs",
         ":gif_h_rs",
     ],
+    visibility = ["//src:__pkg__"],
     deps = ["//lib/gif"],
-    visibility = ["//:__pkg__"],
 )

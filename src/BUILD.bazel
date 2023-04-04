@@ -1,10 +1,20 @@
-filegroup(
+load("//:versions.bzl", "RUST_EDITION")
+load("@crate_index//:defs.bzl", "aliases")
+load("@rules_rust//rust:defs.bzl", "rust_library")
+
+rust_library(
     name = "src",
     srcs = [
-        "lib.rs",
         "error.rs",
-        "//src/bin",
+        "lib.rs",
         "//src/gif",
     ],
-    visibility = ["//:__pkg__"],
+    aliases = aliases(normal = True),
+    edition = RUST_EDITION,
+    visibility = [":__subpackages__"],
+    deps = [
+        "//src/gif:cc",
+        "//src/gif:gif_rust_proto",
+        "@crate_index//:clap",
+    ],
 )

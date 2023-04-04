@@ -1,5 +1,5 @@
 {
-  "checksum": "d5bab79b7a3c54bf44d3f373da9a97c969d2ce655910411622a77a0539e9c2a6",
+  "checksum": "0ed5693653032e094ac4b9a0957b5110386a25ec23e0704bbe82fe0960df4349",
   "crates": {
     "anstream 0.2.6": {
       "name": "anstream",
@@ -598,6 +598,43 @@
       },
       "license": "MIT OR Apache-2.0"
     },
+    "direct-cargo-bazel-deps 0.0.1": {
+      "name": "direct-cargo-bazel-deps",
+      "version": "0.0.1",
+      "repository": null,
+      "targets": [
+        {
+          "Library": {
+            "crate_name": "direct_cargo_bazel_deps",
+            "crate_root": ".direct_cargo_bazel_deps.rs",
+            "srcs": {
+              "include": [
+                "**/*.rs"
+              ],
+              "exclude": []
+            }
+          }
+        }
+      ],
+      "library_target_name": "direct_cargo_bazel_deps",
+      "common_attrs": {
+        "compile_data_glob": [
+          "**"
+        ],
+        "deps": {
+          "common": [
+            {
+              "id": "clap 4.2.1",
+              "target": "clap"
+            }
+          ],
+          "selects": {}
+        },
+        "edition": "2018",
+        "version": "0.0.1"
+      },
+      "license": null
+    },
     "errno 0.3.0": {
       "name": "errno",
       "version": "0.3.0",
@@ -737,55 +774,6 @@
         }
       },
       "license": "MIT"
-    },
-    "fuzz 1.0.0": {
-      "name": "fuzz",
-      "version": "1.0.0",
-      "repository": null,
-      "targets": [
-        {
-          "Library": {
-            "crate_name": "fuzz",
-            "crate_root": "src/lib.rs",
-            "srcs": {
-              "include": [
-                "**/*.rs"
-              ],
-              "exclude": []
-            }
-          }
-        },
-        {
-          "Binary": {
-            "crate_name": "gif_to_proto",
-            "crate_root": "src/bin/gif_to_proto.rs",
-            "srcs": {
-              "include": [
-                "**/*.rs"
-              ],
-              "exclude": []
-            }
-          }
-        }
-      ],
-      "library_target_name": "fuzz",
-      "common_attrs": {
-        "compile_data_glob": [
-          "**"
-        ],
-        "deps": {
-          "common": [
-            {
-              "id": "clap 4.2.1",
-              "target": "clap"
-            }
-          ],
-          "selects": {}
-        },
-        "edition": "2021",
-        "version": "1.0.0"
-      },
-      "license": null
     },
     "heck 0.4.1": {
       "name": "heck",
@@ -982,7 +970,7 @@
           "selects": {
             "cfg(not(any(windows, target_os = \"hermit\", target_os = \"unknown\")))": [
               {
-                "id": "rustix 0.37.6",
+                "id": "rustix 0.37.7",
                 "target": "rustix"
               }
             ],
@@ -1281,13 +1269,13 @@
       },
       "license": "MIT OR Apache-2.0"
     },
-    "rustix 0.37.6": {
+    "rustix 0.37.7": {
       "name": "rustix",
-      "version": "0.37.6",
+      "version": "0.37.7",
       "repository": {
         "Http": {
-          "url": "https://crates.io/api/v1/crates/rustix/0.37.6/download",
-          "sha256": "d097081ed288dfe45699b72f5b5d648e5f15d64d900c7080273baa20c16a6849"
+          "url": "https://crates.io/api/v1/crates/rustix/0.37.7/download",
+          "sha256": "2aae838e49b3d63e9274e1c01833cc8139d3fec468c3b84688c628f44b1ae11d"
         }
       },
       "targets": [
@@ -1340,7 +1328,7 @@
               "target": "io_lifetimes"
             },
             {
-              "id": "rustix 0.37.6",
+              "id": "rustix 0.37.7",
               "target": "build_script_build"
             }
           ],
@@ -1381,7 +1369,7 @@
           }
         },
         "edition": "2018",
-        "version": "0.37.6"
+        "version": "0.37.7"
       },
       "build_script_attrs": {
         "data_glob": [
@@ -2143,7 +2131,7 @@
     "clap 4.2.1"
   ],
   "workspace_members": {
-    "fuzz 1.0.0": ""
+    "direct-cargo-bazel-deps 0.0.1": ""
   },
   "conditions": {
     "aarch64-pc-windows-gnullvm": [],
