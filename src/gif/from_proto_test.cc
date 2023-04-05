@@ -11,8 +11,8 @@ namespace gif {
 using ::google::protobuf::TextFormat;
 
 TEST(FromProtoTest, ReEncode) {
-  auto gif = read_file("src/gif/testdata/64x64.gif");
-  auto textpb = read_file("src/gif/testdata/64x64.gif.textpb");
+  const auto gif = read_file("src/gif/testdata/64x64.gif");
+  const auto textpb = read_file("src/gif/testdata/64x64.gif.textpb");
 
   Gif pb;
   EXPECT_TRUE(TextFormat::ParseFromString(

@@ -1,32 +1,50 @@
 #include "from_proto.h"
 
 #include <algorithm>
+#include <iostream>
+#include <limits>
+#include <random>
+#include <vector>
+
 #include <cstdint>
 #include <cstring>
-#include <limits>
-#include <vector>
 
 #include <gif_lib.h>
 
 #include "src/gif/gif.pb.h"
 
 namespace gif {
+namespace {
+constexpr char kGif99a[] = "kGif99a";
+}
 auto from_proto(const Gif &proto) -> std::vector<uint8_t> {
   std::vector<uint8_t> gif = {};
 
+  std::random_device rd;
+  std::mt19937 rg(rd());
+  std::uniform_int_distribution<uint8_t> uint8_d(0, 255);
+
   // GIF header.
   switch (proto.version()) {
+  case ZEROS:
+    gif.insert(gif.end(), GIF_STAMP_LEN, 0);
+    break;
   case GIF87:
     gif.insert(gif.end(), GIF87_STAMP, &GIF87_STAMP[GIF_STAMP_LEN]);
     break;
   case GIF89:
     gif.insert(gif.end(), GIF89_STAMP, &GIF89_STAMP[GIF_STAMP_LEN]);
     break;
-  case RANDOM_VERSION:
-  default:
-    // No header. This will be an invalid image.
-    // TODO: Maybe enforce a valid image no matter what?
+  case GIF99:
+    gif.insert(gif.end(), kGif99a, &kGif99a[sizeof(kGif99a)]);
     break;
+  case RANDOM_VERSION:
+    for (int i = 0; i < GIF_STAMP_LEN; ++i) {
+      gif.push_back(uint8_d(rg));
+    }
+    break;
+  default:
+    break; // should never happen
   }
 
   // Height & width.
