@@ -8,7 +8,7 @@
 
 #include <gif_lib.h>
 
-#include "src/gif/span.h"
+#include "src/gif/test_util.h"
 
 namespace gif {
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {

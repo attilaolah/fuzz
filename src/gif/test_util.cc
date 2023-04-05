@@ -1,12 +1,16 @@
-#include "testdata.h"
+#include "test_util.h"
 
+#include <algorithm>
 #include <fstream>
 #include <iostream>
+#include <memory>
+#include <span>
 #include <stdexcept>
 #include <string>
 #include <vector>
 
 #include <cstdint>
+#include <cstring>
 
 namespace gif {
 using std::ios;
@@ -26,5 +30,17 @@ auto read_file(const std::string &path) -> std::vector<uint8_t> {
 
   f.close();
   return data;
+}
+
+auto read_span(GifFileType *gif, GifByteType *dst, int size) -> int {
+  auto *src = static_cast<std::unique_ptr<std::span<uint8_t>> *>(gif->UserData);
+  if (src == nullptr) {
+    return 0;
+  }
+
+  size = std::min(static_cast<int>((*src)->size()), size);
+  std::memcpy(dst, (*src)->data(), size);
+  src->reset(new std::span<uint8_t>((*src)->subspan(size)));
+  return size;
 }
 } // namespace gif

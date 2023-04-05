@@ -1,8 +1,15 @@
+#include <algorithm>
+#include <memory>
+#include <span>
+
+#include <cstdint>
+
+#include <gif_lib.h>
 #include <libprotobuf-mutator/src/libfuzzer/libfuzzer_macro.h>
 
 #include "src/gif/from_proto.h"
 #include "src/gif/gif.pb.h"
-#include "src/gif/span.h"
+#include "src/gif/test_util.h"
 
 namespace gif {
 

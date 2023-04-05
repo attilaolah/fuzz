@@ -7,8 +7,7 @@
 #include <gif_lib.h>
 #include <gtest/gtest.h>
 
-#include "span.h"
-#include "testdata.h"
+#include "test_util.h"
 
 namespace gif {
 

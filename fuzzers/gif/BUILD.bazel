@@ -10,8 +10,9 @@ cc_fuzz_test(
     ]),
     deps = [
         "//lib/gif",
-        "//src/gif:span",
+        "//src/gif:test_util",
     ],
+    testonly = 1,
 )
 
 cc_fuzz_test(
@@ -26,8 +27,9 @@ cc_fuzz_test(
         "//lib/protobuf_mutator",
         "//src/gif:from_proto",
         "//src/gif:gif_cc_proto",
-        "//src/gif:span",
+        "//src/gif:test_util",
     ],
+    testonly = 1,
 )
 
 sh_binary(

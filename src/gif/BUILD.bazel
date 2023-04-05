@@ -54,8 +54,7 @@ cc_test(
     srcs = ["gif_test.cc"],
     data = ["testdata/64x64.gif"],
     deps = [
-        ":span",
-        ":testdata",
+        ":test_util",
         "//lib/gif",
         "@com_google_googletest//:gtest_main",
     ],
@@ -76,22 +75,16 @@ cc_test(
     srcs = ["from_proto_test.cc"],
     deps = [
         ":from_proto",
-        ":testdata",
+        ":test_util",
         "@com_google_googletest//:gtest_main",
     ],
 )
 
 cc_library(
-    name = "testdata",
+    name = "test_util",
     testonly = 1,
-    srcs = ["testdata.cc"],
-    hdrs = ["testdata.h"],
-)
-
-cc_library(
-    name = "span",
-    srcs = ["span.cc"],
-    hdrs = ["span.h"],
+    srcs = ["test_util.cc"],
+    hdrs = ["test_util.h"],
     deps = ["//lib/gif"],
 )
 
