@@ -1,4 +1,7 @@
 #include <algorithm>
+#include <memory>
+#include <span>
+
 #include <cstdint>
 #include <cstdio>
 #include <cstring>
@@ -9,15 +12,15 @@
 
 namespace gif {
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
-  return 0;
-
-  Span span{.data = data, .size = size};
+  auto span = std::make_unique<std::span<const uint8_t>>(data, size);
   int err;
 
-  if (GifFileType *gif = DGifOpen(&span, &Span::read, &err); gif != nullptr) {
+  if (GifFileType *gif = DGifOpen(&span, read_span, &err); gif != nullptr) {
     DGifSlurp(gif);
     DGifCloseFile(gif, &err);
   }
+
+  return 0;
 }
 
-} // namespace
+} // namespace gif
