@@ -11,4 +11,5 @@ rust_binary(
         "//src",
         "@crate_index//:clap",
     ],
+    visibility = ["//src/gif/testdata:__pkg__"],
 )
