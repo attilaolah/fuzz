@@ -15,7 +15,7 @@
 
 namespace gif {
 namespace {
-constexpr char kGif99a[] = "kGif99a";
+constexpr char kGif99a[] = "GIF99a";
 
 void fill_with_zeros(std::vector<uint8_t> &data, size_t n) {
   data.insert(data.end(), n, 0);
@@ -34,6 +34,9 @@ void fill_with_random(std::vector<uint8_t> &data, std::mt19937 &rg, size_t n) {
 void write_colours(std::vector<uint8_t> &gif, const ColourMap &cm,
                    std::mt19937 &rg) {
   const size_t colour_count = 1 << (((cm.bits_per_pixel() - 1) & 0b111) + 1);
+  if (colour_count == 0) {
+    return;
+  }
   if (cm.has_values()) {
     const auto &values = cm.values();
     if (values.rgb().empty()) {
@@ -218,7 +221,7 @@ auto from_proto(const Gif &proto) -> std::vector<uint8_t> {
       gif.push_back(img_bits_per_pixel);
 
       // Write (height * width) bytes of pixel data.
-      if (desc.has_values()) {
+      if (desc.has_values() && !desc.values().empty()) {
         // TODO: This needs to be LZ-encoded for a valid image, maybe parse some
         // existing data or try to compress it using the giflib functions.
         gif.insert(gif.end(), desc.values().begin(), desc.values().end());
