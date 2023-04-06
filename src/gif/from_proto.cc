@@ -51,8 +51,6 @@ void write_colours(std::vector<uint8_t> &gif, const ColourMap &cm,
     }
   } else if (cm.has_zeros()) {
     fill_with_zeros(gif, colour_count * 3);
-  } else if (cm.has_random()) {
-    fill_with_random(gif, rg, colour_count * 3);
   }
 }
 } // namespace
@@ -220,6 +218,11 @@ auto from_proto(const Gif &proto) -> std::vector<uint8_t> {
       // Image code size, which is really just the bits-per-pixel.
       gif.push_back(img_bits_per_pixel);
 
+      if (h * w == 0) {
+        // Not really a valid image, but there should be no data inserted anyway.
+        continue;
+      }
+
       // Write (height * width) bytes of pixel data.
       if (desc.has_values() && !desc.values().empty()) {
         // TODO: This needs to be LZ-encoded for a valid image, maybe parse some
@@ -227,8 +230,6 @@ auto from_proto(const Gif &proto) -> std::vector<uint8_t> {
         gif.insert(gif.end(), desc.values().begin(), desc.values().end());
       } else if (desc.has_zeros()) {
         fill_with_zeros(gif, h * w);
-      } else if (desc.has_random()) {
-        fill_with_random(gif, rg, h * w);
       }
       continue;
     }

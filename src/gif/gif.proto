@@ -43,7 +43,6 @@ message ColourMap {
   oneof colours {
     RGBValues values = 5;
     Empty zeros = 6;
-    Empty random = 7;
   }
 }
 
@@ -91,7 +90,6 @@ message ImageDescriptor {
   oneof colours {
     bytes values = 7;
     Empty zeros = 8;
-    Empty random = 9;
   }
 }
 
