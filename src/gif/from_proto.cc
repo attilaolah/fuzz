@@ -36,6 +36,10 @@ void write_colours(std::vector<uint8_t> &gif, const ColourMap &cm,
   const size_t colour_count = 1 << (((cm.bits_per_pixel() - 1) & 0b111) + 1);
   if (cm.has_values()) {
     const auto &values = cm.values();
+    if (values.rgb().empty()) {
+      // Nothing to write, just return.
+      return;
+    }
     for (size_t i = 0; i < colour_count; i++) {
       const RGB &rgb = values.rgb(i % values.rgb().size());
       gif.push_back(rgb.r() & 0xff);
