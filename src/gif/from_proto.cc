@@ -214,9 +214,15 @@ auto from_proto(const Gif &proto) -> std::vector<uint8_t> {
       gif.push_back(img_bits_per_pixel);
 
       // Write (height * width) bytes of pixel data.
-      // TODO: This needs to be LZ-encoded for a valid image, maybe parse some
-      // existing data or try to compress it using the giflib functions.
-      gif.insert(gif.end(), desc.values().begin(), desc.values().end());
+      if (desc.has_values()) {
+        // TODO: This needs to be LZ-encoded for a valid image, maybe parse some
+        // existing data or try to compress it using the giflib functions.
+        gif.insert(gif.end(), desc.values().begin(), desc.values().end());
+      } else if (desc.has_zeros()) {
+        fill_with_zeros(gif, h * w);
+      } else if (desc.has_random()) {
+        fill_with_random(gif, rg, h * w);
+      }
       continue;
     }
 
