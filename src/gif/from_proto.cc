@@ -53,6 +53,15 @@ void write_colours(std::vector<uint8_t> &gif, const ColourMap &cm,
     fill_with_zeros(gif, colour_count * 3);
   }
 }
+
+int append_to_vector(GifFileType *file, const GifByteType *data, int size) {
+  auto *vec = static_cast<std::vector<uint8_t> *>(file->UserData);
+  // If user-data is null, ignore the write, but report as if it was successful.
+  if (vec != nullptr) {
+    vec->insert(vec->end(), data, data + size);
+  }
+  return size;
+}
 } // namespace
 
 auto from_proto(const Gif &proto) -> std::vector<uint8_t> {
@@ -219,15 +228,88 @@ auto from_proto(const Gif &proto) -> std::vector<uint8_t> {
       gif.push_back(img_bits_per_pixel);
 
       if (h * w == 0) {
-        // Not really a valid image, but there should be no data inserted anyway.
+        // Not really a valid image, but oh well.
         continue;
       }
 
       // Write (height * width) bytes of pixel data.
       if (desc.has_values() && !desc.values().empty()) {
-        // TODO: This needs to be LZ-encoded for a valid image, maybe parse some
-        // existing data or try to compress it using the giflib functions.
-        gif.insert(gif.end(), desc.values().begin(), desc.values().end());
+        if (!(proto.has_colour_map() || desc.has_colour_map())) {
+          // At least one colour map (global or image-local) is necessary.
+          // If none exist, we can't write any image data.
+          continue;
+        }
+
+        // Create a new GIF file using the giflib library.
+        // We will discard the results of anything except the image data.
+        GifFileType *f = EGifOpen(nullptr, append_to_vector, nullptr);
+        if (f == nullptr) {
+          throw std::runtime_error("GIF file could not be created");
+        }
+
+        // Set the image dimensions.
+        if (EGifPutScreenDesc(f, w, h, proto.colour_resolution(),
+                              proto.background_colour() & 0xff,
+                              nullptr) != GIF_OK) {
+          throw std::runtime_error(GifErrorString(f->Error));
+        }
+
+        // Colour map.
+        const auto &cm =
+            proto.has_colour_map() ? proto.colour_map() : desc.colour_map();
+        const size_t colour_count =
+            1 << (((cm.bits_per_pixel() - 1) & 0b111) + 1);
+        if (colour_count == 0) {
+          // We need at least some colours for writing image data.
+          continue;
+        }
+        ColorMapObject *cmap = GifMakeMapObject(colour_count, nullptr);
+        /*
+         * NOTE: It would be possible to copy colour values too, if needed:
+        if (cm.has_values()) {
+          const auto &values = cm.values();
+          if (values.rgb().empty()) {
+            continue;
+          }
+          for (size_t i = 0; i < colour_count; i++) {
+            const RGB &rgb = values.rgb(i % values.rgb().size());
+            cmap->Colors[i].Red = rgb.r() & 0xff;
+            cmap->Colors[i].Green = rgb.g() & 0xff;
+            cmap->Colors[i].Blue = rgb.b() & 0xff;
+          }
+        } else if (cm.has_zeros()) {
+          for (size_t i = 0; i < colour_count; i++) {
+            cmap->Colors[i].Red = 0x00;
+            cmap->Colors[i].Green = 0x00;
+            cmap->Colors[i].Blue = 0x00;
+          }
+        }*/
+
+        // Write the image description.
+        if (EGifPutImageDesc(f, l, t, w, h, desc.interlaced(), cmap) !=
+            GIF_OK) {
+          throw std::runtime_error(GifErrorString(f->Error));
+        }
+
+        // Enable writing.
+        f->UserData = &gif;
+
+        // TODO: This won't fly with interlaced images!
+        const int line_len = w * sizeof(GifByteType);
+        for (int y = 0; y < h; y++) {
+          const uint8_t *line = reinterpret_cast<const uint8_t *>(
+              desc.values().data() + (line_len * y));
+          if (EGifPutLine(f, const_cast<GifPixelType *>(line), line_len) !=
+              GIF_OK) {
+            throw std::runtime_error(GifErrorString(f->Error));
+          }
+        }
+
+        // Disable writing.
+        f->UserData = nullptr;
+
+        // Close the GIF file
+        EGifCloseFile(f, nullptr);
       } else if (desc.has_zeros()) {
         fill_with_zeros(gif, h * w);
       }
