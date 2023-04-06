@@ -1,0 +1,127 @@
+version: GIF87
+width: 220
+height: 165
+colour_resolution: 8
+colour_map {
+  present: true
+  bits_per_pixel: 8
+  values {
+  }
+}
+background_colour: 128
+blocks {
+  ext {
+    code: APPLICATION
+    content: "NETSCAPE2.0"
+  }
+}
+blocks {
+  ext {
+    content: "\001\000\000"
+  }
+}
+blocks {
+  ext {
+    code: GRAPHICS
+    content: "\005\n\000\200"
+  }
+}
+blocks {
+  desc {
+    left: 1
+    width: 219
+    height: 220
+    zeros {
+    }
+  }
+}
+blocks {
+  ext {
+    code: GRAPHICS
+    content: "\005\n\000\200"
+  }
+}
+blocks {
+  desc {
+    left: 17
+    width: 195
+    height: 159
+    zeros {
+    }
+  }
+}
+blocks {
+  ext {
+    code: GRAPHICS
+    content: "\005\n\000\200"
+  }
+}
+blocks {
+  desc {
+    width: 220
+    height: 165
+    zeros {
+    }
+  }
+}
+blocks {
+  ext {
+    code: GRAPHICS
+    content: "\005\n\000\200"
+  }
+}
+blocks {
+  desc {
+    width: 220
+    height: 165
+    zeros {
+    }
+  }
+}
+blocks {
+  ext {
+    code: GRAPHICS
+    content: "\005\n\000\200"
+  }
+}
+blocks {
+  desc {
+    left: 2
+    width: 214
+    height: 159
+    zeros {
+    }
+  }
+}
+blocks {
+  ext {
+    code: GRAPHICS
+    content: "\005\n\000\200"
+  }
+}
+blocks {
+  desc {
+    width: 220
+    height: 165
+    zeros {
+    }
+  }
+}
+blocks {
+  ext {
+    code: GRAPHICS
+    content: "\005\n\000\200"
+  }
+}
+blocks {
+  desc {
+    width: 220
+    height: 165
+    zeros {
+    }
+  }
+}
+blocks {
+  terminator {
+  }
+}

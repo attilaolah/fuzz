@@ -8,11 +8,16 @@ filegroup(
 )
 
 to_proto(
-    name = "textpb",
+    name = "gif_textpb",
     srcs = [":gif"],
     # The gifs in the corpus can be very big, zero out their content.
     # This preserves enough of the structure, and lets the fuzzer experiment.
     args = ["--zeros"],
+)
+
+filegroup(
+    name = "artifacts",
+    srcs = glob(["*.textpb"]),
 )
 
 package_group(

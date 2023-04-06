@@ -1,0 +1,75 @@
+version: GIF87
+width: 220
+height: 220
+colour_resolution: 8
+colour_map {
+  present: true
+  bits_per_pixel: 8
+  zeros {
+  }
+}
+background_colour: 64735
+blocks {
+}
+blocks {
+  ext {
+    code: GRAPHICS
+    content: "\005\n\000\200"
+  }
+}
+blocks {
+}
+blocks {
+  desc {
+    random {
+    }
+  }
+}
+blocks {
+  desc {
+    width: 64735
+    height: 64735
+    zeros {
+    }
+  }
+}
+blocks {
+  desc {
+    width: 64735
+    height: 64735
+    zeros {
+    }
+  }
+}
+blocks {
+  desc {
+    width: 220
+    height: 220
+    zeros {
+    }
+  }
+}
+blocks {
+  desc {
+    left: 219
+    top: 219
+    width: 1
+    height: 1
+    zeros {
+    }
+  }
+}
+blocks {
+  desc {
+    random {
+    }
+  }
+}
+blocks {
+  terminator {
+  }
+}
+blocks {
+  terminator {
+  }
+}

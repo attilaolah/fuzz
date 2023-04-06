@@ -16,7 +16,10 @@ cc_fuzz_test(
     name = "decode_proto_fuzz_test",
     size = "small",
     srcs = ["decode_proto_fuzz_test.cc"],
-    corpus = ["//fuzzers/gif/corpus:textpb"],
+    corpus = [
+        "//fuzzers/gif/corpus:artifacts",
+        "//fuzzers/gif/corpus:gif_textpb",
+    ],
     deps = [
         "//lib/gif",
         "//lib/protobuf_mutator",
