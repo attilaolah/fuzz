@@ -83,8 +83,8 @@ auto from_proto(const Gif &proto) -> std::vector<uint8_t> {
   }
 
   // Height & width.
-  uint16_t w = proto.width() & 0xffff;
-  uint16_t h = proto.height() & 0xffff;
+  uint32_t w = proto.width() & 0xffff;
+  uint32_t h = proto.height() & 0xffff;
   while (w * h > 0 && w > (std::numeric_limits<int32_t>::max() / h)) {
     if (w > h) {
       w /= 2;
@@ -182,10 +182,10 @@ auto from_proto(const Gif &proto) -> std::vector<uint8_t> {
       const auto &desc = block.desc();
 
       // Image position & dimensions.
-      uint16_t l = desc.left() & 0xffff;
-      uint16_t t = desc.top() & 0xffff;
-      uint16_t w = desc.width() & 0xffff;
-      uint16_t h = desc.height() & 0xffff;
+      uint32_t l = desc.left() & 0xffff;
+      uint32_t t = desc.top() & 0xffff;
+      uint32_t w = desc.width() & 0xffff;
+      uint32_t h = desc.height() & 0xffff;
       while (w * h > 0 && w > (std::numeric_limits<int32_t>::max() / h)) {
         if (w > h) {
           w /= 2;
