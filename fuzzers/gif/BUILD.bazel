@@ -4,10 +4,7 @@ cc_fuzz_test(
     name = "decode_fuzz_test",
     size = "small",
     srcs = ["decode_fuzz_test.cc"],
-    corpus = glob([
-        "corpus/*.gif",
-        "testdata/*.gif",
-    ]),
+    corpus = ["//fuzzers/gif/corpus:gif"],
     deps = [
         "//lib/gif",
         "//src/gif:test_util",
@@ -19,9 +16,7 @@ cc_fuzz_test(
     name = "decode_proto_fuzz_test",
     size = "small",
     srcs = ["decode_proto_fuzz_test.cc"],
-    corpus = glob([
-        "testdata/*.textproto",
-    ]),
+    corpus = ["//fuzzers/gif/corpus:textpb"],
     deps = [
         "//lib/gif",
         "//lib/protobuf_mutator",

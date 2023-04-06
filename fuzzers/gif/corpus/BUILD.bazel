@@ -1,0 +1,21 @@
+load("//src/gif:to_proto.bzl", "to_proto")
+
+package(default_visibility = [":users"])
+
+filegroup(
+    name = "gif",
+    srcs = glob(["*.gif"]),
+)
+
+to_proto(
+    name = "textpb",
+    srcs = [":gif"],
+    # The gifs in the corpus can be very big, zero out their content.
+    # This preserves enough of the structure, and lets the fuzzer experiment.
+    args = ["--zeros"],
+)
+
+package_group(
+    name = "users",
+    packages = ["//fuzzers/gif"],
+)

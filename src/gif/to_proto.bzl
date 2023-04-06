@@ -6,6 +6,7 @@ def _to_proto_impl(ctx):
         args = ctx.actions.args()
         args.add("--gif", src)
         args.add("--proto", output)
+        args.add_all(ctx.attr.args)
 
         ctx.actions.run(
             executable = ctx.executable._to_proto,

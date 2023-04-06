@@ -42,6 +42,7 @@ pub fn to_proto(path: &str, seed: u64, zeros: bool) -> Result<pb::Gif, Error> {
 
     proto.width = gif.SWidth.try_into()?;
     proto.height = gif.SHeight.try_into()?;
+    proto.colour_resolution = gif.SColorResolution.try_into()?;
 
     if !gif.SColorMap.is_null() {
         proto.set_colour_map(colour_map(unsafe { *gif.SColorMap }, zeros)?);
@@ -92,10 +93,10 @@ pub fn to_proto(path: &str, seed: u64, zeros: bool) -> Result<pb::Gif, Error> {
             desc.set_colour_map(colour_map(unsafe { *val.ImageDesc.ColorMap }, zeros)?);
         }
 
-        let size = desc.width * desc.height;
         if zeros {
-            desc.set_zeros(size);
+            desc.set_zeros(pb::Empty::new());
         } else {
+            let size = desc.width * desc.height;
             let mut data = Vec::with_capacity(size.try_into()?);
             data.extend_from_slice(unsafe { from_raw_parts(val.RasterBits, size.try_into()?) });
             desc.set_values(data);
@@ -107,7 +108,7 @@ pub fn to_proto(path: &str, seed: u64, zeros: bool) -> Result<pb::Gif, Error> {
     }
 
     let mut block = pb::Block::new();
-    let terminator = pb::Terminator::new();
+    let terminator = pb::Empty::new();
     block.value = Some(pb::Block_oneof_value::terminator(terminator));
     proto.blocks.push(block);
 
@@ -153,14 +154,11 @@ fn gif_close(gif: *mut GifFileType) -> Result<(), Error> {
 fn colour_map(cmap: ColorMapObject, zeros: bool) -> Result<pb::ColourMap, Error> {
     let mut proto = pb::ColourMap::new();
     proto.present = true;
-    proto.colour_resolution = log_2(cmap.ColorCount.try_into()?);
     proto.bits_per_pixel = cmap.BitsPerPixel.try_into()?;
     proto.is_sorted = cmap.SortFlag;
 
     if zeros {
-        proto.colours = Some(pb::ColourMap_oneof_colours::zeros(
-            cmap.ColorCount.try_into()?,
-        ));
+        proto.colours = Some(pb::ColourMap_oneof_colours::zeros(pb::Empty::new()));
     } else {
         let mut rgb_vals = pb::RGBValues::new();
         for i in (0 as usize)..cmap.ColorCount.try_into()? {
@@ -168,14 +166,10 @@ fn colour_map(cmap: ColorMapObject, zeros: bool) -> Result<pb::ColourMap, Error>
 
             let mut rgb = pb::RGB::new();
             (rgb.r, rgb.g, rgb.b) = (c.Red.into(), c.Green.into(), c.Blue.into());
-            rgb_vals.values.push(rgb);
+            rgb_vals.rgb.push(rgb);
         }
         proto.colours = Some(pb::ColourMap_oneof_colours::values(rgb_vals));
     }
 
     Ok(proto)
-}
-
-fn log_2(x: u32) -> u32 {
-    31 - x.leading_zeros()
 }

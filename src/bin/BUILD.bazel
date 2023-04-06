@@ -11,5 +11,13 @@ rust_binary(
         "//src",
         "@crate_index//:clap",
     ],
-    visibility = ["//src/gif/testdata:__pkg__"],
+    visibility = [":gif_users"],
+)
+
+package_group(
+    name = "gif_users",
+    packages = [
+        "//src/gif/testdata",
+        "//fuzzers/gif/corpus",
+    ],
 )

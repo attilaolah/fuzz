@@ -5,22 +5,23 @@ package gif;
 message Gif {
   Version version = 1;
 
-  uint32 width = 2;  // 2 bytes
-  uint32 height = 3; // 2 bytes
+  uint32 width = 2;             // 2 bytes
+  uint32 height = 3;            // 2 bytes
+  uint32 colour_resolution = 4; // 3 bits
 
-  ColourMap colour_map = 4;
+  ColourMap colour_map = 5;
 
-  // NOTE: This should be at most (1 << colour_resolution).
+  // NOTE: This should be at most (1 << bits_per_pixel).
   // A good fuzzer would certainly try values outside that range :)
-  uint32 background_colour = 5; // 1 byte
-  uint32 aspect_ratio = 6;      // 1 byte
+  uint32 background_colour = 6; // 1 byte
+  uint32 aspect_ratio = 7;      // 1 byte
 
-  repeated Block blocks = 7;
+  repeated Block blocks = 8;
 
   // Used for whenever a random value is needed.
   // This makes the output deterministic, but allows the fuzzer to introduce
   // randomness by modifying this seed value.
-  uint64 seed = 8;
+  uint64 seed = 9;
 }
 
 enum Version {
@@ -37,13 +38,12 @@ enum Version {
 
 message ColourMap {
   bool present = 1;
-  uint32 colour_resolution = 2; // 3 bits
-  uint32 bits_per_pixel = 3;    // 3 bits
+  uint32 bits_per_pixel = 3; // 3 bits
   bool is_sorted = 4;
   oneof colours {
     RGBValues values = 5;
-    uint32 zeros = 6;
-    uint32 random = 7;
+    Empty zeros = 6;
+    Empty random = 7;
   }
 }
 
@@ -53,13 +53,13 @@ message RGB {
   uint32 b = 3;
 }
 
-message RGBValues { repeated RGB values = 1; }
+message RGBValues { repeated RGB rgb = 1; }
 
 message Block {
   oneof value {
     Extension ext = 1;
     ImageDescriptor desc = 2;
-    Terminator terminator = 3;
+    Empty terminator = 3;
   }
 }
 
@@ -90,11 +90,9 @@ message ImageDescriptor {
 
   oneof colours {
     bytes values = 7;
-    uint32 zeros = 8;
-    uint32 random = 9;
+    Empty zeros = 8;
+    Empty random = 9;
   }
-
-  uint32 code_size = 10; // 1 byte
 }
 
-message Terminator {}
+message Empty {}
