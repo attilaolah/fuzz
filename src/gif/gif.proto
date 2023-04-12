@@ -1,0 +1,96 @@
+syntax = "proto3";
+
+package gif;
+
+message Gif {
+  Version version = 1;
+
+  uint32 width = 2;             // 2 bytes
+  uint32 height = 3;            // 2 bytes
+  uint32 colour_resolution = 4; // 3 bits
+
+  ColourMap colour_map = 5;
+
+  // NOTE: This should be at most (1 << bits_per_pixel).
+  // A good fuzzer would certainly try values outside that range :)
+  uint32 background_colour = 6; // 1 byte
+  uint32 aspect_ratio = 7;      // 1 byte
+
+  repeated Block blocks = 8;
+
+  // Used for whenever a random value is needed.
+  // This makes the output deterministic, but allows the fuzzer to introduce
+  // randomness by modifying this seed value.
+  uint64 seed = 9;
+}
+
+enum Version {
+  ZEROS = 0; // 6 zero bytes
+  GIF87 = 1; // GIF87_STAMP ("GIF87a")
+  GIF89 = 2; // GIF89_STAMP ("GIF89a")
+
+  // Special value that forces giflib to detect a GIF 89 version.
+  GIF99 = 3; // "GIF99a"
+
+  // Random garbage.
+  RANDOM_VERSION = 4;
+}
+
+message ColourMap {
+  bool present = 1;
+  uint32 bits_per_pixel = 3; // 3 bits
+  bool is_sorted = 4;
+  oneof colours {
+    RGBValues values = 5;
+    Empty zeros = 6;
+  }
+}
+
+message RGB {
+  uint32 r = 1;
+  uint32 g = 2;
+  uint32 b = 3;
+}
+
+message RGBValues { repeated RGB rgb = 1; }
+
+message Block {
+  oneof value {
+    Extension ext = 1;
+    ImageDescriptor desc = 2;
+    Empty terminator = 3;
+  }
+}
+
+message Extension {
+  Function code = 1;
+  bytes content = 2;
+}
+
+enum Function {
+  CONTINUATION = 0;
+  PLAIN_TEXT = 1;
+  COMMENT = 2;
+  GRAPHICS = 3;
+  APPLICATION = 4;
+
+  // Random byte.
+  RANDOM_FUNCTION = 5;
+}
+
+message ImageDescriptor {
+  uint32 left = 1;   // 2 bytes
+  uint32 top = 2;    // 2 bytes
+  uint32 width = 3;  // 2 bytes
+  uint32 height = 4; // 2 bytes
+  bool interlaced = 5;
+
+  ColourMap colour_map = 6;
+
+  oneof colours {
+    bytes values = 7;
+    Empty zeros = 8;
+  }
+}
+
+message Empty {}

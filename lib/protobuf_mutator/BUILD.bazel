@@ -19,18 +19,11 @@ cmake_lib(
         "protobuf-mutator",
         "protobuf-mutator-libfuzzer",
     ]],
-    visibility = ["//lib:__subpackages__"],
+    visibility = ["//fuzzers:__subpackages__"],
     deps = [
         "//lib/lzma",
         "//lib/z",
         "@com_google_protobuf//:protobuf",
         "@com_google_protobuf//:protobuf_headers",
     ],
-)
-
-filegroup(
-    name = "headers",
-    srcs = [":protobuf_mutator"],
-    output_group = "include",
-    visibility = ["//lib:__subpackages__"],
 )

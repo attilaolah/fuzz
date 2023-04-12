@@ -1,4 +1,4 @@
-pushd "${BUILD_WORKSPACE_DIRECTORY}/lib/gif/corpus"
+pushd "${BUILD_WORKSPACE_DIRECTORY}/fuzzers/gif/corpus"
 
 # Download the 50 GIFs from tenor.com.
 curl --silent https://tenor.com \

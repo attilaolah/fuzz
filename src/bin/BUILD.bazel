@@ -1,0 +1,23 @@
+load("//:versions.bzl", "RUST_EDITION")
+load("@rules_rust//rust:defs.bzl", "rust_binary")
+load("@crate_index//:defs.bzl", "aliases", "all_crate_deps")
+
+rust_binary(
+    name = "gif_to_proto",
+    srcs = ["gif_to_proto.rs"],
+    aliases = aliases(normal = True),
+    edition = RUST_EDITION,
+    deps = [
+        "//src",
+        "@crate_index//:clap",
+    ],
+    visibility = [":gif_users"],
+)
+
+package_group(
+    name = "gif_users",
+    packages = [
+        "//src/gif/testdata",
+        "//fuzzers/gif/corpus",
+    ],
+)

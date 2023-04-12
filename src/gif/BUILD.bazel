@@ -1,0 +1,103 @@
+load("@rules_rust//bindgen:bindgen.bzl", "rust_bindgen")
+load("@rules_rust//proto:proto.bzl", "rust_proto_library")
+load("@rules_rust//rust:defs.bzl", "rust_library")
+
+package(default_visibility = [":users"])
+
+filegroup(
+    name = "gif",
+    srcs = [
+        "mod.rs",
+        "to_proto.rs",
+    ],
+)
+
+proto_library(
+    name = "gif_proto",
+    srcs = ["gif.proto"],
+)
+
+cc_proto_library(
+    name = "gif_cc_proto",
+    deps = [":gif_proto"],
+)
+
+rust_proto_library(
+    name = "gif_rust_proto",
+    deps = [":gif_proto"],
+)
+
+cc_library(
+    name = "gif_h",
+    hdrs = ["gif.h"],
+    deps = ["//lib/gif"],
+)
+
+rust_bindgen(
+    name = "gif_h_rs",
+    cc_lib = ":gif_h",
+    header = "gif.h",
+)
+
+rust_library(
+    name = "cc",
+    srcs = [
+        "cc.rs",
+        ":gif_h_rs",
+    ],
+    deps = ["//lib/gif"],
+)
+
+cc_test(
+    name = "gif_test",
+    size = "small",
+    srcs = ["gif_test.cc"],
+    data = ["//src/gif/testdata:gif"],
+    deps = [
+        ":test_util",
+        "//lib/gif",
+        "@com_google_googletest//:gtest_main",
+    ],
+)
+
+cc_library(
+    name = "from_proto",
+    srcs = ["from_proto.cc"],
+    hdrs = ["from_proto.h"],
+    deps = [
+        ":gif_cc_proto",
+        "//lib/gif",
+    ],
+)
+
+cc_test(
+    name = "from_proto_test",
+    size = "small",
+    srcs = ["from_proto_test.cc"],
+    data = [
+        "//src/gif/testdata:gif",
+        "//src/gif/testdata:textpb",
+    ],
+    deps = [
+        ":from_proto",
+        ":gif_cc_proto",
+        ":test_util",
+        "@com_google_googletest//:gtest_main",
+    ],
+)
+
+cc_library(
+    name = "test_util",
+    testonly = 1,
+    srcs = ["test_util.cc"],
+    hdrs = ["test_util.h"],
+    deps = ["//lib/gif"],
+)
+
+package_group(
+    name = "users",
+    packages = [
+        "//fuzzers/gif",
+        "//src",  # TODO: Resolve this dependency!
+    ],
+)

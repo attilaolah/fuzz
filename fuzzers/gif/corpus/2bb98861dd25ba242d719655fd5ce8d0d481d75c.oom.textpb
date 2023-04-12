@@ -1,0 +1,113 @@
+version: GIF87
+width: 220
+height: 121
+colour_resolution: 8
+colour_map {
+  values {
+    rgb {
+      b: 32
+    }
+  }
+}
+background_colour: 192
+blocks {
+  desc {
+    left: 31
+    colour_map {
+      values {
+        rgb {
+          b: 32
+        }
+      }
+    }
+  }
+}
+blocks {
+  ext {
+    content: "\001\000\000"
+  }
+}
+blocks {
+  ext {
+    code: COMMENT
+    content: "\005\n\000\300"
+  }
+}
+blocks {
+  desc {
+    width: 220
+    height: 121
+    zeros {
+    }
+  }
+}
+blocks {
+  ext {
+    code: GRAPHICS
+    content: "\005\n\000\300"
+  }
+}
+blocks {
+  desc {
+    left: 5
+    width: 215
+    height: 121
+    zeros {
+    }
+  }
+}
+blocks {
+  ext {
+    code: GRAPHICS
+    content: "\005\n\000\300"
+  }
+}
+blocks {
+  desc {
+    left: 4
+    width: 536870996
+    height: 121
+    zeros {
+    }
+  }
+}
+blocks {
+  ext {
+    code: GRAPHICS
+    content: "\005\n\000\300"
+  }
+}
+blocks {
+  desc {
+    left: 5
+    width: 215
+    height: 121
+    zeros {
+    }
+  }
+}
+blocks {
+}
+blocks {
+  desc {
+    left: 4
+    width: 16775640
+    height: 1179207545
+    colour_map {
+      values {
+        rgb {
+          b: 32
+        }
+        rgb {
+          r: 3528796928
+        }
+      }
+    }
+    zeros {
+    }
+  }
+}
+blocks {
+  terminator {
+  }
+}

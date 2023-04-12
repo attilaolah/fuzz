@@ -3,3 +3,4 @@
 bazel-*
 node_modules
 target
+tmp

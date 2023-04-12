@@ -99,7 +99,7 @@ def workspace_dependencies():
 
     http_archive(
         name = "rules_fuzzing",
-        version = "9865504b549e86ccfb4713afcc1914c982567f05", # > 0.3.2
+        version = "9865504b549e86ccfb4713afcc1914c982567f05",  # > 0.3.2
         sha256 = "e711a5169ec5f295893328d859b71778614d31760c6942165b4b3131515c5a25",
         urls = ["https://github.com/bazelbuild/{name}/archive/{version}.zip"],
         strip_prefix = "{name}-{version}",

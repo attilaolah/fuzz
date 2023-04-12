@@ -61,18 +61,38 @@ crate_universe_dependencies(bootstrap = True)
 
 rust_analyzer_dependencies()
 
-load("@rules_rust//crate_universe:defs.bzl", "crates_repository")
+load("@rules_rust//crate_universe:defs.bzl", "crate", "crates_repository")
 
 crates_repository(
     name = "crate_index",
     cargo_lockfile = "//:Cargo.lock",
     lockfile = "//:Cargo.bazel.lock",
-    manifests = ["//:Cargo.toml"],
+    packages = {
+        "clap": crate.spec(
+            features = ["derive"],
+            version = "4.1.6",
+        ),
+    },
 )
 
 load("@crate_index//:defs.bzl", "crate_repositories")
 
 crate_repositories()
+
+load("@rules_rust//proto:repositories.bzl", "rust_proto_repositories")
+
+rust_proto_repositories()
+
+load("@rules_rust//proto:transitive_repositories.bzl", "rust_proto_transitive_repositories")
+
+rust_proto_transitive_repositories()
+
+load("@rules_rust//bindgen:repositories.bzl", "rust_bindgen_dependencies", "rust_bindgen_register_toolchains")
+
+# TODO: Use Clang from this repo!
+rust_bindgen_dependencies()
+
+rust_bindgen_register_toolchains()
 
 ## Skylib dependencies.
 
