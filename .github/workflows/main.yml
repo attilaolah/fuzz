@@ -21,6 +21,8 @@ jobs:
           key: ${{ runner.os }}-Bazel-${{ hashFiles('WORKSPACE', '**/*.bazel', '**/*.bzl') }}
           restore-keys: |
             ${{ runner.os }}-Bazel-
+      # Required by Clang 16:
+      - run: sudo apt-get install libtinfo5
       - run: bazel version
       - run: bazel query //...
       - run: bazel build --nobuild //...
