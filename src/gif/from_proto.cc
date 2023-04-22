@@ -16,9 +16,10 @@
 namespace gif {
 namespace {
 constexpr char kGif99a[] = "GIF99a";
+constexpr size_t kMaxSize = 64 * 1024 * 1024; // 64 MiB, approximate
 
 void fill_with_zeros(std::vector<uint8_t> &data, size_t n) {
-  data.insert(data.end(), n, 0);
+  data.insert(data.end(), std::min(kMaxSize - data.size(), n), 0);
 }
 
 void fill_with_random(std::vector<uint8_t> &data, std::mt19937 &rg, size_t n) {
@@ -26,13 +27,12 @@ void fill_with_random(std::vector<uint8_t> &data, std::mt19937 &rg, size_t n) {
       std::numeric_limits<uint8_t>::min(),
       std::numeric_limits<uint8_t>::max(),
   };
-  for (int i = 0; i < n; i++) {
+  for (int i = 0; i < n && data.size() < kMaxSize; i++) {
     data.push_back(uint8_d(rg));
   }
 }
 
-void write_colours(std::vector<uint8_t> &gif, const ColourMap &cm,
-                   std::mt19937 &rg) {
+void write_colours(std::vector<uint8_t> &gif, const ColourMap &cm) {
   const size_t colour_count = 1 << (((cm.bits_per_pixel() - 1) & 0b111) + 1);
   if (colour_count == 0) {
     return;
@@ -43,7 +43,7 @@ void write_colours(std::vector<uint8_t> &gif, const ColourMap &cm,
       // Nothing to write, just return.
       return;
     }
-    for (size_t i = 0; i < colour_count; i++) {
+    for (size_t i = 0; i < colour_count && gif.size() < kMaxSize; i++) {
       const RGB &rgb = values.rgb(i % values.rgb().size());
       gif.push_back(rgb.r() & 0xff);
       gif.push_back(rgb.g() & 0xff);
@@ -108,7 +108,7 @@ auto from_proto(const Gif &proto) -> std::vector<uint8_t> {
 
   uint8_t bits_per_pixel = 0;
 
-  // Colour map.
+  // Global colour map.
   auto cm = proto.colour_map();
   uint8_t byte = ((proto.colour_resolution() - 1) & 0b111) << 4; // 01110000
   if (proto.has_colour_map()) {
@@ -127,7 +127,7 @@ auto from_proto(const Gif &proto) -> std::vector<uint8_t> {
   gif.push_back(proto.aspect_ratio() & 0xff);
 
   if (proto.has_colour_map()) {
-    write_colours(gif, proto.colour_map(), rg);
+    write_colours(gif, proto.colour_map());
   }
 
   for (const auto &block : proto.blocks()) {
@@ -167,7 +167,7 @@ auto from_proto(const Gif &proto) -> std::vector<uint8_t> {
         gif.push_back(0x00);
         continue;
       }
-      for (size_t i = 0; i < content.size(); i++) {
+      for (size_t i = 0; i < content.size() && gif.size() < kMaxSize; i++) {
         if ((i & 0xff) == 0) {
           if (i != 0) {
             // This is not the first chunk of 255 bytes, i.e. a continuation.
@@ -178,6 +178,10 @@ auto from_proto(const Gif &proto) -> std::vector<uint8_t> {
           gif.push_back(std::min(content.size() - i, 0xffUL) & 0xff);
         }
         gif.push_back(content[i]);
+      }
+
+      if (gif.size() >= kMaxSize) {
+        return gif;
       }
 
       // NOTE: Extension blocks are only applied to the next image that is read.
@@ -218,7 +222,7 @@ auto from_proto(const Gif &proto) -> std::vector<uint8_t> {
         byte |= 0b1000;                      // 00001000
         byte |= cm.bits_per_pixel() & 0b111; // 00000111
         gif.push_back(byte);
-        write_colours(gif, cm, rg);
+        write_colours(gif, cm);
         img_bits_per_pixel = cm.bits_per_pixel() & 0xff;
       } else {
         gif.push_back(byte);
@@ -313,6 +317,11 @@ auto from_proto(const Gif &proto) -> std::vector<uint8_t> {
       } else if (desc.has_zeros()) {
         fill_with_zeros(gif, h * w);
       }
+
+      if (gif.size() >= kMaxSize) {
+        return gif;
+      }
+
       continue;
     }
 

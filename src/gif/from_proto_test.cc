@@ -31,15 +31,17 @@ TEST(FromProtoTest, ReEncode) {
     EXPECT_EQ(new_gif[i], gif[i]) << "At byte index: " << i;
   }
 
-  // To write the results into a temporary file (e.g. for inspection), run:
-  // bazel test --test_env=TEST_FILE_OUT=/path/to/result.gif //src/gif:from_proto_test
-  if (const char* env_var = std::getenv("TEST_FILE_OUT"); env_var != nullptr) {
+  // To write the results into a temporary file (e.g. for inspection), pass
+  // --test_env=TEST_FILE_OUT=/path/to/result.gif to the bazel test command.
+  if (const char *env_var = std::getenv("TEST_FILE_OUT"); env_var != nullptr) {
     const std::string file_path(env_var);
     if (std::ofstream file(file_path, std::ios::binary); file) {
-      file.write(reinterpret_cast<const char*>(new_gif.data()), new_gif.size());
+      file.write(reinterpret_cast<const char *>(new_gif.data()),
+                 new_gif.size());
       file.close();
     } else {
-      std::cerr << "ERROR: could not open file " << file_path << " for writing." << std::endl;
+      std::cerr << "ERROR: could not open file " << file_path << " for writing."
+                << std::endl;
     }
   }
 }
